@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load icons %}
 {% block title %}Dashboard · Warehouse{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
@@ -51,7 +52,10 @@
     <!-- Low stock products -->
     <div class="card !p-0">
       <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-        <h2 class="text-sm font-semibold text-slate-700">⚠️ Low Stock Products</h2>
+        <h2 class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          {% icon 'exclamation' 18 'h-4 w-4 text-amber-500' %}
+          Low Stock Products
+        </h2>
         {% if low_stock > 5 %}
           <a href="{% url 'products:list' %}?status=active&q=" class="text-xs text-emerald-600 hover:underline">View all {{ low_stock }} →</a>
         {% endif %}
@@ -80,14 +84,19 @@
           </tbody>
         </table>
       {% else %}
-        <div class="px-5 py-8 text-center text-sm text-slate-500">All products are well-stocked ✅</div>
+        <div class="px-5 py-8 text-center text-sm text-slate-500">All products are well-stocked
+          {% icon 'check' 16 'h-4 w-4 inline text-emerald-500' %}
+        </div>
       {% endif %}
     </div>
 
     <!-- Recent transactions -->
     <div class="card !p-0">
       <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-        <h2 class="text-sm font-semibold text-slate-700">📦 Recent Transactions</h2>
+        <h2 class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          {% icon 'archive' 18 'h-4 w-4 text-slate-500' %}
+          Recent Transactions
+        </h2>
         <a href="{% url 'stock:list' %}" class="text-xs text-emerald-600 hover:underline">View all →</a>
       </div>
       {% if recent_transactions %}

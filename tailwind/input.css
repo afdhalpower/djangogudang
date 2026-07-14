@@ -10,4 +10,41 @@
   .card {
     @apply rounded-2xl bg-white p-6 shadow-sm border border-slate-200;
   }
+
+  /* Consistent form control styling (Django renders bare inputs) */
+  .form-input,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  textarea,
+  select {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:cursor-not-allowed disabled:bg-slate-50;
+  }
+
+  textarea {
+    @apply resize-y;
+  }
+
+  /* Checkbox / radio — keep them visible & on-brand */
+  input[type="checkbox"],
+  input[type="radio"] {
+    @apply h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500;
+  }
+
+  /* Field label */
+  label {
+    @apply mb-1 block text-xs font-medium text-slate-600;
+  }
+}
+
+/* Reduce layout shift from Django's default form row wrappers */
+form p {
+  margin-bottom: 1rem;
+}
+form p:last-child {
+  margin-bottom: 0;
 }

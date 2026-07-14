@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",      # flash messages — exactly like Laravel's session()->flash()
     "django.contrib.staticfiles",   # asset pipeline — like Laravel's mix()/Vite helper
     # --- project apps (built feature-by-feature) ---
+    "core",
     "accounts",
     "dashboard",
     "categories",
@@ -74,6 +75,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",  # exposes `user` in every template
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.notification_unread_count",
             ],
         },
     },
