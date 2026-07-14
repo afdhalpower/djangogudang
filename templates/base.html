@@ -48,6 +48,7 @@
         </div>
         <a href="{% url 'notifications:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Notifications</a>
         <a href="{% url 'search:results' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">🔍 Search</a>
+        <a href="{% url 'settings_app:edit' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Settings</a>
       </nav>
       <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
         Logged in as <span class="text-slate-300">{{ user.username }}</span>

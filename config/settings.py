@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "reports",
     "notifications",  # computed low-stock alerts via dashboard/context processor
     "search",  # global AJAX search
+    "settings_app",
 ]
 
 MIDDLEWARE = [

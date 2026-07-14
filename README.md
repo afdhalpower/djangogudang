@@ -37,7 +37,7 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Reports** — Inventory Report (summary cards + valuation), Low Stock Report (shortage + supplier), Stock Card (per-product movement), CSV export all 3
 - [x] **Notifications** — computed low-stock alerts (critical/warning), severity cards with inline Stock In action
 - [x] **Global Search** — unified search across products (name/SKU/barcode), suppliers (company/contact), transactions (reference)
-- [ ] **Settings** — company profile, warehouse information, system settings
+- [x] **Settings** — company profile, warehouse info, preferences (low-stock threshold, currency), single-row model singleton pattern
 
 ## Quick Start
 

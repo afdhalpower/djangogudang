@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Settings · Warehouse{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl">
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Company Profile -->
+      <h2 class="mb-4 text-base font-semibold text-slate-700">Company Profile</h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm font-medium">{{ form.company_name.label }}</label>
+          {{ form.company_name }}
+          {% if form.company_name.errors %}<p class="mt-1 text-xs text-red-600">{{ form.company_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm font-medium">{{ form.address.label }}</label>
+          {{ form.address }}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.phone.label }}</label>
+          {{ form.phone }}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.email.label }}</label>
+          {{ form.email }}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.tax_id.label }}</label>
+          {{ form.tax_id }}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.logo.label }}</label>
+          {{ form.logo }}
+          {% if form.instance.logo %}
+            <p class="mt-1 text-xs text-slate-400">Current: <a href="{{ form.instance.logo.url }}" class="text-emerald-600 hover:underline">{{ form.instance.logo.name }}</a></p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Warehouse -->
+      <h2 class="mb-4 mt-8 text-base font-semibold text-slate-700">Warehouse</h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.warehouse_name.label }}</label>
+          {{ form.warehouse_name }}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm font-medium">{{ form.warehouse_address.label }}</label>
+          {{ form.warehouse_address }}
+        </div>
+      </div>
+
+      <!-- System Settings -->
+      <h2 class="mb-4 mt-8 text-base font-semibold text-slate-700">System Settings</h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.currency.label }}</label>
+          {{ form.currency }}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ form.low_stock_threshold.label }}</label>
+          {{ form.low_stock_threshold }}
+          {% if form.low_stock_threshold.help_text %}<p class="mt-1 text-xs text-slate-400">{{ form.low_stock_threshold.help_text }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="mt-8 flex items-center gap-3 border-t pt-4">
+        <button type="submit" class="btn-primary">Save Settings</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

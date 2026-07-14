@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Settings · Warehouse{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl">
+  {% if messages %}
+    <div class="mb-4">
+      {% for msg in messages %}
+        <div class="rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Company Information -->
+      <fieldset class="mb-8">
+        <legend class="mb-4 text-base font-semibold text-slate-800">Company Information</legend>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Company Name</label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}<p class="mt-1 text-xs text-red-500">{{ form.company_name.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Tax ID / NPWP</label>
+            {{ form.tax_id }}
+            {% if form.tax_id.errors %}<p class="mt-1 text-xs text-red-500">{{ form.tax_id.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="mb-1 block text-xs font-medium text-slate-500">Address</label>
+            {{ form.address }}
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Phone</label>
+            {{ form.phone }}
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Email</label>
+            {{ form.email }}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="mb-1 block text-xs font-medium text-slate-500">Website</label>
+            {{ form.website }}
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Warehouse Information -->
+      <fieldset class="mb-8">
+        <legend class="mb-4 text-base font-semibold text-slate-800">Warehouse Information</legend>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Warehouse Name</label>
+            {{ form.warehouse_name }}
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Warehouse Code</label>
+            {{ form.warehouse_code }}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="mb-1 block text-xs font-medium text-slate-500">Location</label>
+            {{ form.warehouse_location }}
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Preferences -->
+      <fieldset class="mb-8">
+        <legend class="mb-4 text-base font-semibold text-slate-800">Preferences</legend>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Default Currency</label>
+            {{ form.default_currency }}
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-500">Low Stock Alert Threshold</label>
+            {{ form.low_stock_threshold }}
+          </div>
+          <div class="flex items-center gap-3">
+            {{ form.enable_low_stock_alert }}
+            <label class="text-sm text-slate-600">Enable Low Stock Alerts</label>
+          </div>
+          <div class="flex items-center gap-3">
+            {{ form.enable_low_stock_email }}
+            <label class="text-sm text-slate-600">Email Alerts</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="flex items-center gap-3 border-t border-slate-200 pt-6">
+        <button type="submit" class="btn-primary">Save Settings</button>
+        <span class="text-xs text-slate-400">Last updated: {{ form.instance.updated_at|date:"d M Y H:i" }}</span>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
