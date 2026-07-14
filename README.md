@@ -35,8 +35,8 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Stock Adjustment** — reason (lost/damaged/expired/correction) + direction (add/remove), atomic, negative stock protection
 - [x] **Transaction History** — filter by type, date range, product search (name/SKU), pagination
 - [x] **Reports** — Inventory Report (summary cards + valuation), Low Stock Report (shortage + supplier), Stock Card (per-product movement), CSV export all 3
-- [ ] **Notifications** — low stock warning, dashboard alert
-- [ ] **Global Search** — search products, suppliers, transactions
+- [x] **Notifications** — computed low-stock alerts (critical/warning), severity cards with inline Stock In action
+- [x] **Global Search** — unified search across products (name/SKU/barcode), suppliers (company/contact), transactions (reference)
 - [ ] **Settings** — company profile, warehouse information, system settings
 
 ## Quick Start

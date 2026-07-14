@@ -22,6 +22,7 @@ urlpatterns = [
     path("stock/", include("stock.urls")),
     path("reports/", include("reports.urls")),
     path("notifications/", include("notifications.urls")),
+    path("search/", include("search.urls")),
     path("", include("dashboard.urls")),
 ]
 

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "stock",
     "reports",
     "notifications",  # computed low-stock alerts via dashboard/context processor
+    "search",  # global AJAX search
 ]
 
 MIDDLEWARE = [
@@ -72,7 +73,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",  # exposes `user` in every template
                 "django.contrib.messages.context_processors.messages",
-                "notifications.context_processors.notification_unread_count",
             ],
         },
     },
