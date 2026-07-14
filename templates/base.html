@@ -45,6 +45,7 @@
           <a href="{% url 'reports:low_stock' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Low Stock</a>
           <a href="{% url 'reports:stock_card' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Stock Card</a>
         </div>
+        <a href="{% url 'notifications:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Notifications</a>
       </nav>
       <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
         Logged in as <span class="text-slate-300">{{ user.username }}</span>
@@ -60,6 +61,12 @@
         <div class="ml-auto flex items-center gap-3 text-sm">
           {% if user.is_authenticated %}
           <span class="hidden sm:inline text-slate-500">{{ user.get_full_name|default:user.username }}</span>
+          <a href="{% url 'notifications:list' %}" class="relative rounded-lg px-3 py-1.5 hover:bg-slate-100">
+            🔔
+            {% if notification_unread_count > 0 %}
+              <span class="absolute -top-0.5 -right-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">{{ notification_unread_count }}</span>
+            {% endif %}
+          </a>
           <a href="{% url 'accounts:profile' %}" class="rounded-lg px-3 py-1.5 hover:bg-slate-100">Profile</a>
           <form method="post" action="{% url 'accounts:logout' %}" class="inline">
             {% csrf_token %}
