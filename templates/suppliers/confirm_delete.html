@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Delete Supplier · Warehouse{% endblock %}
+{% block page_title %}Delete: {{ supplier.company_name }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg">
+  <div class="card text-center">
+    <div class="mb-2 text-3xl">⚠️</div>
+    <p class="mb-2 text-base font-semibold">Are you sure you want to delete <span class="text-emerald-700">{{ supplier.company_name }}</span>?</p>
+    <p class="mb-6 text-sm text-slate-500">This action cannot be undone.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="flex items-center justify-center gap-3">
+        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Yes, delete</button>
+        <a href="{% url 'suppliers:list' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
