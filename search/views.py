@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from products.models import Product
@@ -56,3 +57,52 @@ class GlobalSearchView(LoginRequiredMixin, TemplateView):
         context["transaction_count"] = transactions.count()
 
         return context
+
+
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def global_search_json(request):
+    """JSON endpoint for topbar autocomplete — returns lightweight results."""
+    q = request.GET.get("q", "").strip()
+    if not q or len(q) < 2:
+        return JsonResponse({"results": [], "total": 0})
+
+    results = []
+
+    # Products
+    products = Product.objects.filter(
+        Q(name__icontains=q) | Q(sku__icontains=q)
+    ).select_related("category", "unit")[:5]
+    for p in products:
+        results.append({
+            "type": "product",
+            "label": f"{p.sku} — {p.name}",
+            "subtitle": f"{p.current_stock} {p.unit.abbreviation} · {p.category.name if p.category else '—'}",
+            "url": f"/products/{p.pk}/",
+        })
+
+    # Categories
+    cats = Category.objects.filter(name__icontains=q)[:5]
+    for c in cats:
+        results.append({
+            "type": "category",
+            "label": c.name,
+            "subtitle": f"{'Active' if c.status == 'active' else 'Inactive'}",
+            "url": f"/categories/{c.pk}/",
+        })
+
+    # Suppliers
+    suppliers = Supplier.objects.filter(
+        Q(company_name__icontains=q) | Q(contact_person__icontains=q)
+    )[:5]
+    for s in suppliers:
+        results.append({
+            "type": "supplier",
+            "label": s.company_name,
+            "subtitle": s.contact_person or "—",
+            "url": f"/suppliers/{s.pk}/",
+        })
+
+    return JsonResponse({"results": results, "total": len(results)})

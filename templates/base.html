@@ -68,9 +68,9 @@
           loading: false,
           timer: null,
           async search() {
-            if (this.query.length < 1) { this.results = []; this.open = false; return }
+            if (this.query.length < 2) { this.results = []; this.open = false; return }
             this.loading = true
-            const resp = await fetch('/search/?q=' + encodeURIComponent(this.query))
+            const resp = await fetch('/search/json/?q=' + encodeURIComponent(this.query))
             const data = await resp.json()
             this.results = data.results
             this.open = data.results.length > 0

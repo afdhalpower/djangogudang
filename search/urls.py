@@ -5,4 +5,5 @@ app_name = "search"
 
 urlpatterns = [
     path("", views.GlobalSearchView.as_view(), name="results"),
+    path("json/", views.global_search_json, name="json"),
 ]
