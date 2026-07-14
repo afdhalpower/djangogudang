@@ -15,6 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.db import transaction as db_transaction
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
@@ -108,7 +109,7 @@ class StockAdjustmentCreateView(BaseStockCreateView):
 
 
 class StockTransactionListView(LoginRequiredMixin, ListView):
-    """All transactions with filter by type."""
+    """All transactions with filter by type, date range, and product search."""
     model = StockTransaction
     template_name = "stock/list.html"
     context_object_name = "transactions"
@@ -118,14 +119,36 @@ class StockTransactionListView(LoginRequiredMixin, ListView):
         qs = StockTransaction.objects.select_related("created_by").prefetch_related(
             "items", "items__product"
         )
+
+        # Filter by type
         movement_type = self.request.GET.get("type", "")
         if movement_type in dict(StockTransaction.MOVEMENT_CHOICES):
             qs = qs.filter(movement_type=movement_type)
+
+        # Filter by product search (looks in related items' product name/SKU)
+        q = self.request.GET.get("q", "").strip()
+        if q:
+            qs = qs.filter(
+                Q(items__product__name__icontains=q)
+                | Q(items__product__sku__icontains=q)
+            ).distinct()
+
+        # Filter by date range
+        date_from = self.request.GET.get("date_from", "")
+        date_to = self.request.GET.get("date_to", "")
+        if date_from:
+            qs = qs.filter(date__gte=date_from)
+        if date_to:
+            qs = qs.filter(date__lte=date_to)
+
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter_type"] = self.request.GET.get("type", "")
+        context["filter_q"] = self.request.GET.get("q", "")
+        context["filter_date_from"] = self.request.GET.get("date_from", "")
+        context["filter_date_to"] = self.request.GET.get("date_to", "")
         return context
 
 

@@ -33,7 +33,7 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Stock Out** — multi-line form, auto-decrease stock, negative stock prevention (rollback)
 - [x] **Dashboard** — 5 stat cards (total, low stock, inactive, in/out today), low-stock table, recent activity
 - [x] **Stock Adjustment** — reason (lost/damaged/expired/correction) + direction (add/remove), atomic, negative stock protection
-- [ ] **Transaction History** — complete movement history with filters
+- [x] **Transaction History** — filter by type, date range, product search (name/SKU), pagination
 - [ ] **Reports** — inventory report, low stock report, stock card, CSV/Excel/PDF export
 - [ ] **Notifications** — low stock warning, dashboard alert
 - [ ] **Global Search** — search products, suppliers, transactions
