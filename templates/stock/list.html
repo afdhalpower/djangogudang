@@ -9,10 +9,12 @@
       <a href="{% url 'stock:list' %}" class="rounded-lg border px-3 py-2 text-sm font-medium {% if not filter_type %}bg-slate-800 text-white{% endif %}">All</a>
       <a href="?type=in" class="rounded-lg border px-3 py-2 text-sm font-medium {% if filter_type == 'in' %}bg-emerald-600 text-white{% endif %}">Stock In</a>
       <a href="?type=out" class="rounded-lg border px-3 py-2 text-sm font-medium {% if filter_type == 'out' %}bg-red-600 text-white{% endif %}">Stock Out</a>
+      <a href="?type=adjustment" class="rounded-lg border px-3 py-2 text-sm font-medium {% if filter_type == 'adjustment' %}bg-yellow-600 text-white{% endif %}">Adjustment</a>
     </div>
     <div class="flex items-center gap-2">
       <a href="{% url 'stock:in_create' %}" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">+ Stock In</a>
       <a href="{% url 'stock:out_create' %}" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">+ Stock Out</a>
+      <a href="{% url 'stock:adjust_create' %}" class="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-white hover:bg-yellow-600">+ Adjustment</a>
     </div>
   </div>
 

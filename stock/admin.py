@@ -14,12 +14,25 @@ class StockTransactionItemInline(admin.TabularInline):
 
 @admin.register(StockTransaction)
 class StockTransactionAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "movement_type", "date", "reference_number", "created_by", "created_at")
+    list_display = ("__str__", "movement_type", "date", "reference_number", "adjustment_reason", "created_by", "created_at")
     list_filter = ("movement_type", "date")
     search_fields = ("reference_number", "notes")
     ordering = ("-created_at",)
     inlines = [StockTransactionItemInline]
     readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (None, {
+            "fields": ("movement_type", "date", "reference_number", "notes", "created_by")
+        }),
+        ("Adjustment (only for type=adjustment)", {
+            "fields": ("adjustment_reason", "adjustment_direction"),
+            "classes": ("collapse",),
+        }),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",),
+        }),
+    )
 
 
 @admin.register(StockTransactionItem)

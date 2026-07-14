@@ -20,7 +20,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib import messages
 from .models import StockTransaction, StockTransactionItem
-from .forms import StockInForm, StockOutForm
+from .forms import StockInForm, StockOutForm, StockAdjustmentForm
 from products.models import Product
 
 
@@ -90,6 +90,21 @@ class StockOutCreateView(BaseStockCreateView):
     template_name = "stock/stock_out_form.html"
     success_message = "Stock Out recorded successfully."
     movement_type = StockTransaction.MOVEMENT_OUT
+
+
+class StockAdjustmentCreateView(BaseStockCreateView):
+    """Manual stock adjustment with reason (lost/damaged/expired/correction).
+
+    MENTOR NOTE: Extends the same BaseStockCreateView pattern, proving that
+    Django's class-based inheritance keeps views DRY even as features grow.
+    The template is slightly different (has reason + direction fields) but
+    the save/signal logic is entirely inherited.
+    """
+    model = StockTransaction
+    form_class = StockAdjustmentForm
+    template_name = "stock/stock_adjustment_form.html"
+    success_message = "Stock adjustment recorded."
+    movement_type = StockTransaction.MOVEMENT_ADJUSTMENT
 
 
 class StockTransactionListView(LoginRequiredMixin, ListView):

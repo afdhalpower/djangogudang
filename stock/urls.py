@@ -7,5 +7,6 @@ urlpatterns = [
     path("", views.StockTransactionListView.as_view(), name="list"),
     path("in/new/", views.StockInCreateView.as_view(), name="in_create"),
     path("out/new/", views.StockOutCreateView.as_view(), name="out_create"),
+    path("adjust/new/", views.StockAdjustmentCreateView.as_view(), name="adjust_create"),
     path("<int:pk>/", views.StockTransactionDetailView.as_view(), name="detail"),
 ]

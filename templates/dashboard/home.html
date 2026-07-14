@@ -1,17 +1,121 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Dashboard · Warehouse{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-5xl">
-  <div class="rounded-2xl bg-white p-10 text-center shadow-sm border border-slate-200">
-    <h2 class="text-xl font-semibold">Welcome, {{ user.get_full_name|default:user.username }} 👋</h2>
-    <p class="mt-2 text-sm text-slate-500">
-      Foundation & authentication are live. Dashboard cards, products, and stock
-      modules will be added in the next features.
-    </p>
-    <p class="mt-4 inline-block rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
-      Role: {{ user.get_role_display }}
-    </p>
+<div class="mx-auto max-w-7xl space-y-6">
+
+  <!-- Stat cards row -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="card flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+      <div>
+        <p class="text-2xl font-bold">{{ total_products }}</p>
+        <p class="text-xs text-slate-500">Total Products</p>
+      </div>
+    </div>
+    <div class="card flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg></div>
+      <div>
+        <p class="text-2xl font-bold text-red-600">{{ low_stock }}</p>
+        <p class="text-xs text-slate-500">Low Stock Items</p>
+      </div>
+    </div>
+    <div class="card flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></div>
+      <div>
+        <p class="text-2xl font-bold">{{ inactive_products }}</p>
+        <p class="text-xs text-slate-500">Inactive</p>
+      </div>
+    </div>
+    <div class="card flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+      <div>
+        <p class="text-2xl font-bold">{{ stock_in_today }}</p>
+        <p class="text-xs text-slate-500">Stock In Today</p>
+      </div>
+    </div>
+    <div class="card flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg></div>
+      <div>
+        <p class="text-2xl font-bold">{{ stock_out_today }}</p>
+        <p class="text-xs text-slate-500">Stock Out Today</p>
+      </div>
+    </div>
   </div>
+
+  <!-- Two-column: low-stock alert + recent activity -->
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+    <!-- Low stock products -->
+    <div class="card !p-0">
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-700">⚠️ Low Stock Products</h2>
+        {% if low_stock > 5 %}
+          <a href="{% url 'products:list' %}?status=active&q=" class="text-xs text-emerald-600 hover:underline">View all {{ low_stock }} →</a>
+        {% endif %}
+      </div>
+      {% if low_stock_products %}
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-left text-slate-600">
+            <tr>
+              <th class="px-5 py-2.5 font-medium">Product</th>
+              <th class="px-5 py-2.5 font-medium">SKU</th>
+              <th class="px-5 py-2.5 font-medium">Stock</th>
+              <th class="px-5 py-2.5 font-medium">Min</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for p in low_stock_products %}
+              <tr class="hover:bg-slate-50">
+                <td class="px-5 py-2.5 font-medium">{{ p.name }}</td>
+                <td class="px-5 py-2.5 font-mono text-xs text-slate-500">{{ p.sku }}</td>
+                <td class="px-5 py-2.5">
+                  <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">{{ p.current_stock }}</span>
+                </td>
+                <td class="px-5 py-2.5 text-slate-500">{{ p.minimum_stock }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="px-5 py-8 text-center text-sm text-slate-500">All products are well-stocked ✅</div>
+      {% endif %}
+    </div>
+
+    <!-- Recent transactions -->
+    <div class="card !p-0">
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-700">📦 Recent Transactions</h2>
+        <a href="{% url 'stock:list' %}" class="text-xs text-emerald-600 hover:underline">View all →</a>
+      </div>
+      {% if recent_transactions %}
+        <div class="divide-y divide-slate-100 text-sm">
+          {% for t in recent_transactions %}
+            <div class="flex items-center justify-between px-5 py-3 hover:bg-slate-50">
+              <div class="flex items-center gap-3">
+                {% if t.movement_type == 'in' %}
+                  <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">IN</span>
+                {% else %}
+                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">OUT</span>
+                {% endif %}
+                <div>
+                  <p class="font-medium">{{ t.reference_number|default:"No ref" }}</p>
+                  <p class="text-xs text-slate-400">
+                    {% for item in t.items.all %}{{ item.product.sku }} x{{ item.quantity }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                  </p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400">{{ t.date|date:"d M" }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="px-5 py-8 text-center text-sm text-slate-500">No transactions yet</div>
+      {% endif %}
+    </div>
+  </div>
+
 </div>
 {% endblock %}

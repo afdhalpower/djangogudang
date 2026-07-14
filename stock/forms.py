@@ -4,25 +4,12 @@ from products.models import Product
 
 
 class StockTransactionItemForm(forms.ModelForm):
-    """
-    Form for a single line item. Used inline within the main transaction form.
-    """
     class Meta:
         model = StockTransactionItem
         fields = ["product", "quantity", "unit_price"]
 
 
 class StockInForm(forms.ModelForm):
-    """
-    Specialised form for Stock In — hides movement_type (preset to IN),
-    auto-generates reference if blank, and provides a clean UX for
-    warehouse staff recording incoming goods.
-
-    MENTOR NOTE: We use a dedicated form (not the generic ModelForm) to
-    show different fields for IN vs OUT vs ADJUSTMENT. This follows the
-    "one form per use case" Django best practice — even when backed by the
-    same model.
-    """
     class Meta:
         model = StockTransaction
         fields = ["reference_number", "notes"]
@@ -42,3 +29,29 @@ class StockOutForm(forms.ModelForm):
         widgets = {
             "notes": forms.Textarea(attrs={"rows": 2}),
         }
+
+
+class StockAdjustmentForm(forms.ModelForm):
+    """Form for manual stock adjustment with reason and direction.
+
+    MENTOR NOTE: Unlike StockInForm/StockOutForm which share the same fields,
+    Adjustment shows additional fields (reason, direction) specific to the
+    use case — demonstrating Django's "one form per use case" pattern even
+    when the underlying model is the same.
+    """
+    class Meta:
+        model = StockTransaction
+        fields = ["reference_number", "notes", "adjustment_reason", "adjustment_direction"]
+        widgets = {
+            "notes": forms.Textarea(attrs={"rows": 2}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["adjustment_reason"].required = True
+        self.fields["adjustment_reason"].help_text = "Why is the stock being adjusted?"
+        self.fields["adjustment_direction"].widget = forms.RadioSelect(
+            choices=StockTransaction.ADJUSTMENT_DIRECTION_CHOICES
+        )
+        self.fields["reference_number"].required = False
+        self.fields["reference_number"].help_text = "Internal reference (optional)"

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Stock Adjustment · Warehouse{% endblock %}
+{% block page_title %}New Stock Adjustment{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl">
+  <div class="card">
+    <form method="post" id="stock-form">
+      {% csrf_token %}
+
+      <h2 class="mb-4 text-base font-semibold">Adjustment Details</h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {% for field in form %}
+          {% if field.name != 'adjustment_direction' %}
+          <div class="{% if field.name == 'notes' %}sm:col-span-2{% endif %}">
+            <label class="mb-1 block text-sm font-medium">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p class="mt-1 text-xs text-red-600">{{ field.errors.0 }}</p>{% endif %}
+            {% if field.help_text %}<p class="mt-1 text-xs text-slate-400">{{ field.help_text }}</p>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Direction radio: always visible -->
+      <div class="mt-4">
+        <label class="mb-2 block text-sm font-medium">Direction</label>
+        <div class="flex gap-4">
+          {% for radio in form.adjustment_direction %}
+            <label class="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+              {{ radio.tag }}
+              {{ radio.choice_label }}
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <h2 class="mb-3 mt-6 text-base font-semibold">Items</h2>
+      <p class="mb-3 text-xs text-slate-400">Select products and quantities to adjust.</p>
+
+      <div id="items-container" class="space-y-2">
+        <div class="item-row grid grid-cols-1 gap-2 sm:grid-cols-12">
+          <div class="sm:col-span-5">
+            <select name="product_id" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+              <option value="">— Select product —</option>
+              {% for p in products %}
+                <option value="{{ p.pk }}" data-stock="{{ p.current_stock }}" data-min="{{ p.minimum_stock }}">
+                  {{ p.sku }} — {{ p.name }} (stock: {{ p.current_stock }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="sm:col-span-3">
+            <input type="number" name="quantity" min="1" value="1" placeholder="Qty"
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div class="sm:col-span-3">
+            <input type="number" name="unit_price" min="0" step="0.01" placeholder="Price (optional)" 
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div class="sm:col-span-1 flex items-center">
+            <button type="button" class="remove-row rounded-lg border border-red-200 px-2 py-2 text-xs text-red-600 hover:bg-red-50" onclick="this.closest('.item-row').remove()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" id="add-row" class="mt-2 rounded-lg border border-emerald-300 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-50">+ Add another item</button>
+
+      <div class="mt-6 flex items-center gap-3 border-t pt-4">
+        <button type="submit" class="btn-primary">Record Adjustment</button>
+        <a href="{% url 'stock:list' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('add-row')?.addEventListener('click', function() {
+    const container = document.getElementById('items-container');
+    const first = container.querySelector('.item-row');
+    if (!first) return;
+    const clone = first.cloneNode(true);
+    clone.querySelectorAll('select, input').forEach(el => {
+      if (el.type !== 'button') el.value = '';
+    });
+    clone.querySelector('input[name="quantity"]').value = '1';
+    container.appendChild(clone);
+  });
+</script>
+{% endblock %}

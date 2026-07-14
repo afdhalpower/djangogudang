@@ -55,6 +55,25 @@ def stock_item_saved(sender, instance, created, **kwargs):
             current_stock=F("current_stock") - qty
         )
 
+    elif movement_type == StockTransaction.MOVEMENT_ADJUSTMENT:
+        # Adjustment direction determines add or remove
+        direction = instance.transaction.adjustment_direction
+        if direction == "add":
+            Product.objects.filter(pk=product_id).update(
+                current_stock=F("current_stock") + qty
+            )
+        else:
+            # For "remove", validate sufficient stock
+            product = Product.objects.get(pk=product_id)
+            if product.current_stock < qty:
+                raise ValidationError(
+                    f"Insufficient stock for {product.name} (SKU: {product.sku}). "
+                    f"Available: {product.current_stock}, requested removal: {qty}."
+                )
+            Product.objects.filter(pk=product_id).update(
+                current_stock=F("current_stock") - qty
+            )
+
 
 @receiver(post_delete, sender=StockTransactionItem)
 def stock_item_deleted(sender, instance, **kwargs):
@@ -71,3 +90,13 @@ def stock_item_deleted(sender, instance, **kwargs):
         Product.objects.filter(pk=product_id).update(
             current_stock=F("current_stock") + qty
         )
+    elif movement_type == StockTransaction.MOVEMENT_ADJUSTMENT:
+        direction = instance.transaction.adjustment_direction
+        if direction == "add":
+            Product.objects.filter(pk=product_id).update(
+                current_stock=F("current_stock") - qty
+            )
+        else:
+            Product.objects.filter(pk=product_id).update(
+                current_stock=F("current_stock") + qty
+            )

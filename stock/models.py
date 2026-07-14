@@ -59,6 +59,30 @@ class StockTransaction(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Adjustment-specific fields (only used when movement_type='adjustment')
+    ADJUSTMENT_REASON_CHOICES = [
+        ("lost", "Lost"),
+        ("damaged", "Damaged"),
+        ("expired", "Expired"),
+        ("correction", "Correction"),
+    ]
+    adjustment_reason = models.CharField(
+        max_length=20,
+        choices=ADJUSTMENT_REASON_CHOICES,
+        blank=True,
+        help_text="Reason for stock adjustment (only for adjustment type)",
+    )
+    # Direction of adjustment: add (+) or remove (-) stock
+    ADJUSTMENT_DIRECTION_CHOICES = [
+        ("add", "Add Stock (+)" ),
+        ("remove", "Remove Stock (-)"),
+    ]
+    adjustment_direction = models.CharField(
+        max_length=10,
+        choices=ADJUSTMENT_DIRECTION_CHOICES,
+        default="remove",
+        help_text="Add or remove stock during adjustment",
+    )
 
     class Meta:
         ordering = ["-created_at"]
