@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Categories · Warehouse{% endblock %}
+{% block page_title %}Categories{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="mb-4 flex items-center justify-between">
+    <p class="text-sm text-slate-500">{{ page_obj.paginator.count }} category{% if page_obj.paginator.count != 1 %}ies{% endif %}</p>
+    <a href="{% url 'categories:create' %}" class="btn-primary">+ New Category</a>
+  </div>
+
+  {% if categories %}
+    <div class="card overflow-hidden !p-0">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-600">
+          <tr>
+            <th class="px-4 py-3 font-medium">Name</th>
+            <th class="px-4 py-3 font-medium">Status</th>
+            <th class="px-4 py-3 font-medium">Created</th>
+            <th class="px-4 py-3 text-right font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for cat in categories %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3 font-medium">{{ cat.name }}</td>
+              <td class="px-4 py-3">
+                {% if cat.status == "active" %}
+                  <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Active</span>
+                {% else %}
+                  <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-slate-500">{{ cat.created_at|date:"d M Y" }}</td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'categories:detail' cat.pk %}" class="text-emerald-600 hover:underline">View</a>
+                <span class="mx-1 text-slate-300">·</span>
+                <a href="{% url 'categories:update' cat.pk %}" class="text-emerald-600 hover:underline">Edit</a>
+                <span class="mx-1 text-slate-300">·</span>
+                <a href="{% url 'categories:delete' cat.pk %}" class="text-red-600 hover:underline">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# Pagination — Django's built-in paginator works with CBV paginate_by #}
+    {% if page_obj.has_other_pages %}
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <p class="text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+        <div class="flex gap-2">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="rounded-lg border px-3 py-1.5 hover:bg-slate-100">← Prev</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="rounded-lg border px-3 py-1.5 hover:bg-slate-100">Next →</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="card text-center">
+      <p class="py-8 text-slate-500">No categories yet. <a href="{% url 'categories:create' %}" class="text-emerald-600 hover:underline">Create the first one!</a></p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

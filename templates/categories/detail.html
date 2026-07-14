@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} · Warehouse{% endblock %}
+{% block page_title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl">
+  <div class="card">
+    <div class="mb-4 flex items-start justify-between">
+      <div>
+        <h2 class="text-lg font-semibold">{{ category.name }}</h2>
+        <p class="text-sm text-slate-500">Created {{ category.created_at|date:"d M Y H:i" }}</p>
+      </div>
+      {% if category.status == "active" %}
+        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Active</span>
+      {% else %}
+        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">Inactive</span>
+      {% endif %}
+    </div>
+
+    {% if category.description %}
+      <div class="mb-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        {{ category.description|linebreaks }}
+      </div>
+    {% endif %}
+
+    <div class="flex gap-3 border-t pt-4">
+      <a href="{% url 'categories:update' category.pk %}" class="btn-primary">Edit</a>
+      <a href="{% url 'categories:delete' category.pk %}" class="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">Delete</a>
+      <a href="{% url 'categories:list' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">← Back</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

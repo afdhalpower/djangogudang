@@ -11,7 +11,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path("admin/", admin.site.urls),          # Django Admin — replaces what Filament provides in Laravel
-    path("accounts/", include("accounts.urls")),  # login, logout, profile, password
-    path("", include("dashboard.urls")),          # app home (after login)
+    path("admin/", admin.site.urls),
+    path("accounts/", include("accounts.urls")),
+    path("categories/", include("categories.urls")),
+    path("", include("dashboard.urls")),
 ]
