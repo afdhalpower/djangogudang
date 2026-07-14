@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Warehouse{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="rounded-2xl bg-white p-10 text-center shadow-sm border border-slate-200">
+    <h2 class="text-xl font-semibold">Welcome, {{ user.get_full_name|default:user.username }} 👋</h2>
+    <p class="mt-2 text-sm text-slate-500">
+      Foundation & authentication are live. Dashboard cards, products, and stock
+      modules will be added in the next features.
+    </p>
+    <p class="mt-4 inline-block rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+      Role: {{ user.get_role_display }}
+    </p>
+  </div>
+</div>
+{% endblock %}

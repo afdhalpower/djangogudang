@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App-specific component classes (optional, kept minimal) */
+@layer components {
+  .btn-primary {
+    @apply rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700;
+  }
+  .card {
+    @apply rounded-2xl bg-white p-6 shadow-sm border border-slate-200;
+  }
+}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Login · Warehouse{% endblock %}
+{% block page_title %}Login{% endblock %}
+
+{% block content %}
+<div class="mx-auto mt-10 max-w-sm">
+  <div class="rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
+    <div class="mb-6 text-center">
+      <div class="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500 text-white text-xl">W</div>
+      <h2 class="text-lg font-semibold">Warehouse Login</h2>
+      <p class="text-sm text-slate-500">Silakan masuk untuk melanjutkan</p>
+    </div>
+
+    <!-- Django's auth form. The csrf_token tag is mandatory, like Laravel's @csrf -->
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.errors %}
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          Username atau password salah.
+        </div>
+      {% endif %}
+
+      <div class="space-y-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium">Username</label>
+          <input type="text" name="username" autofocus required
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">Password</label>
+          <input type="password" name="password" required
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+        </div>
+        <button type="submit"
+                class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+          Login
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

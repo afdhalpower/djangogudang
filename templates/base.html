@@ -1,0 +1,76 @@
+{% load static %}
+<!-- base.html — global application shell (sidebar + topbar + content).
+     MENTOR NOTE (Laravel -> Django):
+     Django templates use two special syntaxes: tag tokens and variable
+     tokens, comparable to Blade's at-directives and double-curly variables.
+     The block tag plays the role of Blade's yield, and the extends tag plays
+     the role of Blade's extends. The inheritance mental model is identical. -->
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Warehouse{% endblock %}</title>
+  <!-- Tailwind output (built from tailwind/input.css) -->
+  <link rel="stylesheet" href="{% static 'css/dist.css' %}">
+  <!-- HTMX — progressive enhancement, no React/Vue needed -->
+  <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+  <!-- Alpine.js — lightweight reactivity for UI (dropdowns, toggles) -->
+  <script src="{% static 'vendor/alpine.min.js' %}" defer></script>
+</head>
+<body class="h-full bg-slate-100 text-slate-800 antialiased">
+  <div class="flex h-full" x-data="{ sidebarOpen: false }">
+    <!-- Sidebar (hidden on mobile, toggled via Alpine) -->
+    <aside class="hidden md:flex md:w-64 md:flex-col bg-slate-900 text-slate-100"
+           x-bind:class="sidebarOpen ? 'flex' : 'hidden md:flex'">
+      <div class="flex items-center gap-2 h-16 px-6 font-semibold text-lg border-b border-slate-800">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white">W</span>
+        Warehouse
+      </div>
+      <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+        <a href="{% url 'dashboard:home' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Dashboard</a>
+        <!-- More links (Products, Stock In/Out, Reports…) get added as modules land -->
+      </nav>
+      <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
+        Logged in as <span class="text-slate-300">{{ user.username }}</span>
+      </div>
+    </aside>
+
+    <!-- Main column -->
+    <div class="flex flex-1 flex-col min-w-0">
+      <!-- Topbar -->
+      <header class="flex h-16 items-center gap-4 bg-white border-b px-4 md:px-6">
+        <button class="md:hidden rounded-lg p-2 hover:bg-slate-100" @click="sidebarOpen = !sidebarOpen">☰</button>
+        <h1 class="text-base font-semibold">{% block page_title %}Warehouse{% endblock %}</h1>
+        <div class="ml-auto flex items-center gap-3 text-sm">
+          <span class="hidden sm:inline text-slate-500">{{ user.get_full_name|default:user.username }}</span>
+          <a href="{% url 'accounts:profile' %}" class="rounded-lg px-3 py-1.5 hover:bg-slate-100">Profile</a>
+          <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700">Logout</button>
+          </form>
+        </div>
+      </header>
+
+      <!-- Flash messages -->
+      <div class="px-4 md:px-6 pt-4">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="mb-3 rounded-lg border px-4 py-3 text-sm
+                        {% if message.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800
+                        {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-800
+                        {% else %}border-slate-200 bg-slate-50 text-slate-700{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 overflow-y-auto px-4 md:px-6 py-6">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+</body>
+</html>
