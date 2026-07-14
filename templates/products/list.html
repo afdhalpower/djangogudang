@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Products · Warehouse{% endblock %}
+{% block page_title %}Products{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl">
+  <!-- Search + Filter bar -->
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <form method="get" class="flex flex-wrap items-center gap-2">
+      <div class="relative">
+        <input type="text" name="q" value="{{ q }}"
+               placeholder="Search name, SKU, barcode…"
+               class="w-56 rounded-lg border border-slate-300 px-3 py-2 pl-9 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+        <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
+      </div>
+      <select name="status" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        <option value="">All Status</option>
+        <option value="active" {% if filter_status == "active" %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if filter_status == "inactive" %}selected{% endif %}>Inactive</option>
+      </select>
+      <select name="category" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.pk }}" {% if filter_category == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filter</button>
+      {% if q or filter_status or filter_category %}
+        <a href="{% url 'products:list' %}" class="text-sm text-slate-500 hover:underline">Clear</a>
+      {% endif %}
+    </form>
+    <a href="{% url 'products:create' %}" class="btn-primary">+ New Product</a>
+  </div>
+
+  <p class="mb-3 text-sm text-slate-500">{{ page_obj.paginator.count }} product{{ page_obj.paginator.count|pluralize }}</p>
+
+  {% if products %}
+    <div class="card overflow-hidden !p-0">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-600">
+          <tr>
+            <th class="px-4 py-3 font-medium">SKU</th>
+            <th class="px-4 py-3 font-medium">Name</th>
+            <th class="px-4 py-3 font-medium">Category</th>
+            <th class="px-4 py-3 font-medium">Stock</th>
+            <th class="px-4 py-3 font-medium">Price</th>
+            <th class="px-4 py-3 font-medium">Status</th>
+            <th class="px-4 py-3 text-right font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for p in products %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3 font-mono text-xs">{{ p.sku }}</td>
+              <td class="px-4 py-3">
+                <div class="font-medium">{{ p.name }}</div>
+                {% if p.supplier %}<div class="text-xs text-slate-400">{{ p.supplier.company_name }}</div>{% endif %}
+              </td>
+              <td class="px-4 py-3 text-slate-500">{{ p.category.name }}</td>
+              <td class="px-4 py-3">
+                <span class="{% if p.is_low_stock %}text-red-600 font-semibold{% else %}text-slate-700{% endif %}">
+                  {{ p.current_stock }}
+                </span>
+                <span class="text-xs text-slate-400">/ min {{ p.minimum_stock }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="text-slate-700">Rp{{ p.selling_price|floatformat:0 }}</div>
+                {% if p.purchase_price %}
+                  <div class="text-xs text-slate-400">margin {{ p.profit_margin_percent }}%</div>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3">
+                {% if p.status == "active" %}
+                  <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Active</span>
+                {% else %}
+                  <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'products:detail' p.pk %}" class="text-emerald-600 hover:underline">View</a>
+                <span class="mx-1 text-slate-300">·</span>
+                <a href="{% url 'products:update' p.pk %}" class="text-emerald-600 hover:underline">Edit</a>
+                <span class="mx-1 text-slate-300">·</span>
+                <a href="{% url 'products:delete' p.pk %}" class="text-red-600 hover:underline">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <p class="text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+        <div class="flex gap-2">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if filter_status %}&status={{ filter_status }}{% endif %}{% if filter_category %}&category={{ filter_category }}{% endif %}" class="rounded-lg border px-3 py-1.5 hover:bg-slate-100">← Prev</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if filter_status %}&status={{ filter_status }}{% endif %}{% if filter_category %}&category={{ filter_category }}{% endif %}" class="rounded-lg border px-3 py-1.5 hover:bg-slate-100">Next →</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="card text-center">
+      <p class="py-8 text-slate-500">No products found.
+        {% if q or filter_status or filter_category %}
+          <a href="{% url 'products:list' %}" class="text-emerald-600 hover:underline">Clear filters</a> or
+        {% endif %}
+        <a href="{% url 'products:create' %}" class="text-emerald-600 hover:underline">create one!</a>
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

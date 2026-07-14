@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} · Warehouse{% endblock %}
+{% block page_title %}{{ product.sku }} — {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- Image column -->
+    <div class="card text-center">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="mx-auto max-h-64 rounded-lg object-contain">
+      {% else %}
+        <div class="flex h-48 items-center justify-center rounded-lg bg-slate-100 text-slate-300 text-sm">No image</div>
+      {% endif %}
+      <p class="mt-2 text-xs text-slate-400">SKU: <span class="font-mono">{{ product.sku }}</span></p>
+      {% if product.barcode %}<p class="text-xs text-slate-400">Barcode: <span class="font-mono">{{ product.barcode }}</span></p>{% endif %}
+    </div>
+
+    <!-- Detail column -->
+    <div class="card lg:col-span-2">
+      <div class="mb-4 flex items-start justify-between">
+        <div>
+          <h2 class="text-xl font-semibold">{{ product.name }}</h2>
+          <p class="text-sm text-slate-500">{{ product.category.name }}
+            {% if product.supplier %} · {{ product.supplier.company_name }}{% endif %}
+          </p>
+        </div>
+        {% if product.status == "active" %}
+          <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Active</span>
+        {% else %}
+          <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">Inactive</span>
+        {% endif %}
+      </div>
+
+      {% if product.description %}
+        <div class="mb-6 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">{{ product.description|linebreaks }}</div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="rounded-lg bg-slate-50 px-4 py-3">
+          <dt class="text-xs text-slate-500">Current Stock</dt>
+          <dd class="text-2xl font-bold {% if product.is_low_stock %}text-red-600{% else %}text-slate-800{% endif %}">
+            {{ product.current_stock }}
+          </dd>
+          <dd class="text-xs text-slate-400">Min: {{ product.minimum_stock }}</dd>
+        </div>
+        <div class="rounded-lg bg-slate-50 px-4 py-3">
+          <dt class="text-xs text-slate-500">Selling Price</dt>
+          <dd class="text-lg font-semibold text-slate-800">Rp{{ product.selling_price|floatformat:0 }}</dd>
+        </div>
+        <div class="rounded-lg bg-slate-50 px-4 py-3">
+          <dt class="text-xs text-slate-500">Purchase Price</dt>
+          <dd class="text-lg font-semibold text-slate-800">Rp{{ product.purchase_price|floatformat:0 }}</dd>
+          {% if product.purchase_price %}
+            <dd class="text-xs text-slate-400">Margin: {{ product.profit_margin_percent }}%</dd>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="rounded-lg bg-slate-50 px-4 py-3">
+          <dt class="text-xs text-slate-500">Category</dt>
+          <dd class="text-sm font-medium">{{ product.category.name }}</dd>
+        </div>
+        <div class="rounded-lg bg-slate-50 px-4 py-3">
+          <dt class="text-xs text-slate-500">Unit</dt>
+          <dd class="text-sm font-medium">{{ product.unit.abbreviation }}</dd>
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3 border-t pt-4">
+        <a href="{% url 'products:update' product.pk %}" class="btn-primary">Edit</a>
+        <a href="{% url 'products:delete' product.pk %}" class="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">Delete</a>
+        <a href="{% url 'products:list' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">← Back</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

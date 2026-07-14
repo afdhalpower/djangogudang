@@ -2,9 +2,20 @@
 """Django's command-line utility for administrative tasks.
 Analogous to `php artisan` in Laravel — every management command
 (migrate, runserver, makemigrations, createsuperuser) goes through here.
+
+NOTE: We clear PYTHONPATH to prevent the Hermes agent environment (which
+may have broken/incompatible packages like a Python 3.11 Pillow) from
+contaminating our project's dependencies.
 """
 import os
 import sys
+
+# Clear external PYTHONPATH so our venv packages aren't shadowed
+os.environ.pop("PYTHONPATH", None)
+
+# Remove Hermes paths from sys.path — they may contain incompatible
+# package versions (e.g. Pillow compiled for Python 3.11 vs our 3.12).
+sys.path = [p for p in sys.path if "hermes-agent" not in p]
 
 
 def main():

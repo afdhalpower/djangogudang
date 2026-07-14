@@ -28,7 +28,7 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Categories** — full CRUD (List + pagination, Detail, Create, Update, Delete)
 - [x] **Units** — full CRUD (name + abbreviation; seeded: pcs, box, kg, liter, pack, m, roll, set)
 - [x] **Suppliers** — full CRUD (company name, contact person, phone, email, address)
-- [ ] **Products** — CRUD with SKU, barcode, image, category FK, unit FK, supplier FK, price, stock
+- [x] **Products** — CRUD with SKU, barcode, image, category FK, unit FK, supplier FK, price, stock, search/filter/pagination, N+1 prevention (select_related)
 - [ ] **Stock In** — record incoming inventory, auto-increase stock
 - [ ] **Stock Out** — record outgoing, prevent negative stock
 - [ ] **Stock Adjustment** — manual adjust with reason (lost/damaged/expired/correction)

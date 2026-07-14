@@ -32,7 +32,8 @@
         <a href="{% url 'categories:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Categories</a>
         <a href="{% url 'units:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Units</a>
         <a href="{% url 'suppliers:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Suppliers</a>
-        <!-- More links (Products, Stock In/Out, Reports…) get added as modules land -->
+        <a href="{% url 'products:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Products</a>
+        <!-- More links (Stock In/Out, Reports…) get added as modules land -->
       </nav>
       <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
         Logged in as <span class="text-slate-300">{{ user.username }}</span>
