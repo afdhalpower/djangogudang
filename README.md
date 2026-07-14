@@ -31,9 +31,9 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Products** — CRUD with SKU, barcode, image, category FK, unit FK, supplier FK, price, stock, search/filter/pagination, N+1 prevention (select_related)
 - [x] **Stock In** — multi-line form, auto-increase stock via signal, atomic transactions
 - [x] **Stock Out** — multi-line form, auto-decrease stock, negative stock prevention (rollback)
-- [ ] **Stock Adjustment** — manual adjust with reason (lost/damaged/expired/correction)
-- [ ] **Transaction History** — complete movement history with filters
 - [x] **Dashboard** — 5 stat cards (total, low stock, inactive, in/out today), low-stock table, recent activity
+- [x] **Stock Adjustment** — reason (lost/damaged/expired/correction) + direction (add/remove), atomic, negative stock protection
+- [ ] **Transaction History** — complete movement history with filters
 - [ ] **Reports** — inventory report, low stock report, stock card, CSV/Excel/PDF export
 - [ ] **Notifications** — low stock warning, dashboard alert
 - [ ] **Global Search** — search products, suppliers, transactions

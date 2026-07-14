@@ -34,6 +34,11 @@
         <a href="{% url 'suppliers:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Suppliers</a>
         <a href="{% url 'products:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Products</a>
         <a href="{% url 'stock:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Stock</a>
+        <div class="pl-4 space-y-1 text-xs">
+          <a href="{% url 'stock:in_create' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Stock In</a>
+          <a href="{% url 'stock:out_create' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Stock Out</a>
+          <a href="{% url 'stock:adjust_create' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Adjustment</a>
+        </div>
         <!-- More links (Reports…) get added as modules land -->
       </nav>
       <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
