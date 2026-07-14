@@ -1,5 +1,9 @@
 # Warehouse Inventory Management System
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Django](https://img.shields.io/badge/Django-5.2-092E20.svg)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg)
+
 A modern, professional warehouse inventory management system built with Django 5 — designed for small-to-medium businesses.
 
 ## Learning Mode
@@ -31,13 +35,20 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Products** — CRUD with SKU, barcode, image, category FK, unit FK, supplier FK, price, stock, search/filter/pagination, N+1 prevention (select_related)
 - [x] **Stock In** — multi-line form, auto-increase stock via signal, atomic transactions
 - [x] **Stock Out** — multi-line form, auto-decrease stock, negative stock prevention (rollback)
-- [x] **Dashboard** — 5 stat cards (total, low stock, inactive, in/out today), low-stock table, recent activity
+- [x] **Dashboard** — 5 stat cards (total, low stock, inactive, in/out today), low-stock table, recent activity, **Stock Movement trend chart (14 days)** + **Stock Health doughnut chart** (Chart.js, vendored)
+- [x] **Dashboard Charts** — line chart (In/Out/Adjustment per day) + doughnut (Healthy/Low Stock/Inactive distribution)
 - [x] **Stock Adjustment** — reason (lost/damaged/expired/correction) + direction (add/remove), atomic, negative stock protection
 - [x] **Transaction History** — filter by type, date range, product search (name/SKU), pagination
 - [x] **Reports** — Inventory Report (summary cards + valuation), Low Stock Report (shortage + supplier), Stock Card (per-product movement), CSV export all 3
 - [x] **Notifications** — computed low-stock alerts (critical/warning), severity cards with inline Stock In action
 - [x] **Global Search** — unified search across products (name/SKU/barcode), suppliers (company/contact), transactions (reference)
 - [x] **Settings** — company profile, warehouse info, preferences (low-stock threshold, currency), single-row model singleton pattern
+
+## Screenshot
+
+![Dashboard](docs/dashboard.png)
+
+*Dashboard with stat cards, Stock Movement trend chart (14 days), and Stock Health doughnut chart.*
 
 ## Quick Start
 
@@ -88,4 +99,6 @@ djangogudang/
 
 ## License
 
-Private project — Afdhal RZ
+Released under the [MIT License](LICENSE).
+© 2026 Afdhal Rizaldi.
+
