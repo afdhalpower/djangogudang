@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Stock Card · Warehouse{% endblock %}
+{% block page_title %}Stock Card{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl">
+  <!-- Product selector + date range -->
+  <form method="get" class="mb-4 flex flex-wrap items-end gap-3">
+    <div>
+      <label class="mb-1 block text-xs font-medium text-slate-500">Product</label>
+      <select name="product" class="rounded-lg border border-slate-300 px-3 py-2 text-sm min-w-[200px]">
+        <option value="">— Select product —</option>
+        {% for p in products %}
+          <option value="{{ p.pk }}" {% if selected_product.pk == p.pk %}selected{% endif %}>
+            {{ p.sku }} — {{ p.name }} ({{ p.unit.abbreviation }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-slate-500">From</label>
+      <input type="date" name="date_from" value="{{ date_from }}"
+             class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-slate-500">To</label>
+      <input type="date" name="date_to" value="{{ date_to }}"
+             class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+    </div>
+    <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">View</button>
+    {% if selected_product %}
+      <a href="{% url 'reports:stock_card_csv' %}?product={{ selected_product.pk }}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
+         class="rounded-lg border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Export CSV</a>
+    {% endif %}
+  </form>
+
+  {% if selected_product %}
+    <div class="mb-4 flex items-center gap-4 text-sm">
+      <span class="font-semibold">{{ selected_product.name }}</span>
+      <span class="text-slate-500">SKU: {{ selected_product.sku }}</span>
+      <span class="text-slate-500">Current: <span class="font-medium text-2xl">{{ selected_product.current_stock }}</span> {{ selected_product.unit.abbreviation }}</span>
+    </div>
+
+    <div class="card overflow-hidden !p-0">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-600">
+          <tr>
+            <th class="px-4 py-3 font-medium">Date</th>
+            <th class="px-4 py-3 font-medium">Reference</th>
+            <th class="px-4 py-3 font-medium">Type</th>
+            <th class="px-4 py-3 font-medium">Direction</th>
+            <th class="px-4 py-3 text-right font-medium">Qty</th>
+            <th class="px-4 py-3 text-right font-medium">Price</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for item in items %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-2 text-slate-500">{{ item.transaction.date|date:"d M Y" }}</td>
+              <td class="px-4 py-2 font-mono text-xs">{{ item.transaction.reference_number|default:"—" }}</td>
+              <td class="px-4 py-2">
+                {% if item.transaction.movement_type == "in" %}
+                  <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">IN</span>
+                {% elif item.transaction.movement_type == "out" %}
+                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700">OUT</span>
+                {% else %}
+                  <span class="rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">ADJ</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-2 text-xs text-slate-500">
+                {% if item.transaction.movement_type == "adjustment" %}
+                  {{ item.transaction.get_adjustment_direction_display }}
+                {% else %}—{% endif %}
+              </td>
+              <td class="px-4 py-2 text-right font-medium">{{ item.quantity }}</td>
+              <td class="px-4 py-2 text-right">Rp{{ item.unit_price|floatformat:0|default:"0" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No transactions for this product.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card text-center">
+      <p class="py-8 text-slate-500">Select a product and click View to see its stock movement history.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Inventory Report · Warehouse{% endblock %}
+{% block page_title %}Inventory Report{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl">
+  <div class="mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-3 text-sm text-slate-500">
+      <span>{{ total_items }} products</span>
+      <span class="text-emerald-600 font-medium">Rp{{ total_inventory_value|floatformat:0 }} purchase value</span>
+      <span class="text-emerald-600 font-medium">Rp{{ total_selling_value|floatformat:0 }} selling value</span>
+      <span class="{% if low_stock_count > 0 %}text-red-600{% else %}text-slate-500{% endif %} font-medium">{{ low_stock_count }} low stock</span>
+    </div>
+    <a href="{% url 'reports:inventory_csv' %}" class="rounded-lg border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Export CSV</a>
+  </div>
+
+  <div class="card overflow-hidden !p-0">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-left text-slate-600">
+        <tr>
+          <th class="px-4 py-3 font-medium">SKU</th>
+          <th class="px-4 py-3 font-medium">Name</th>
+          <th class="px-4 py-3 font-medium">Category</th>
+          <th class="px-4 py-3 font-medium">Stock</th>
+          <th class="px-4 py-3 font-medium">Min</th>
+          <th class="px-4 py-3 text-right font-medium">Purchase</th>
+          <th class="px-4 py-3 text-right font-medium">Selling</th>
+          <th class="px-4 py-3 text-right font-medium">Value</th>
+          <th class="px-4 py-3 font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for p in products %}
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-2 font-mono text-xs">{{ p.sku }}</td>
+            <td class="px-4 py-2 font-medium">{{ p.name }}</td>
+            <td class="px-4 py-2 text-slate-500">{{ p.category.name|default:"—" }}</td>
+            <td class="px-4 py-2">
+              <span class="{% if p.current_stock <= p.minimum_stock %}text-red-600 font-medium{% endif %}">{{ p.current_stock }}</span>
+              <span class="text-xs text-slate-400">{{ p.unit.abbreviation }}</span>
+            </td>
+            <td class="px-4 py-2 text-slate-500">{{ p.minimum_stock }}</td>
+            <td class="px-4 py-2 text-right">Rp{{ p.purchase_price|floatformat:0 }}</td>
+            <td class="px-4 py-2 text-right">Rp{{ p.selling_price|floatformat:0 }}</td>
+            <td class="px-4 py-2 text-right font-medium">Rp{{ p.current_stock|floatformat:0 }}</td>
+            <td class="px-4 py-2">
+              {% if p.status == "active" %}
+                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">Active</span>
+              {% else %}
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">No products yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -39,7 +39,12 @@
           <a href="{% url 'stock:out_create' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Stock Out</a>
           <a href="{% url 'stock:adjust_create' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Adjustment</a>
         </div>
-        <!-- More links (Reports…) get added as modules land -->
+        <a href="{% url 'reports:inventory' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Reports</a>
+        <div class="pl-4 space-y-1 text-xs">
+          <a href="{% url 'reports:inventory' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Inventory</a>
+          <a href="{% url 'reports:low_stock' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Low Stock</a>
+          <a href="{% url 'reports:stock_card' %}" class="block px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300">Stock Card</a>
+        </div>
       </nav>
       <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
         Logged in as <span class="text-slate-300">{{ user.username }}</span>
