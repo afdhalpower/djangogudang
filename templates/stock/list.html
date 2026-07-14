@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Stock Transactions · Warehouse{% endblock %}
+{% block page_title %}Stock Transactions{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <a href="{% url 'stock:list' %}" class="rounded-lg border px-3 py-2 text-sm font-medium {% if not filter_type %}bg-slate-800 text-white{% endif %}">All</a>
+      <a href="?type=in" class="rounded-lg border px-3 py-2 text-sm font-medium {% if filter_type == 'in' %}bg-emerald-600 text-white{% endif %}">Stock In</a>
+      <a href="?type=out" class="rounded-lg border px-3 py-2 text-sm font-medium {% if filter_type == 'out' %}bg-red-600 text-white{% endif %}">Stock Out</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{% url 'stock:in_create' %}" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">+ Stock In</a>
+      <a href="{% url 'stock:out_create' %}" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">+ Stock Out</a>
+    </div>
+  </div>
+
+  <p class="mb-3 text-sm text-slate-500">{{ page_obj.paginator.count }} transaction{{ page_obj.paginator.count|pluralize }}</p>
+
+  {% if transactions %}
+    <div class="card overflow-hidden !p-0">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-600">
+          <tr>
+            <th class="px-4 py-3 font-medium">Type</th>
+            <th class="px-4 py-3 font-medium">Date</th>
+            <th class="px-4 py-3 font-medium">Reference</th>
+            <th class="px-4 py-3 font-medium">Items</th>
+            <th class="px-4 py-3 font-medium">Recorded by</th>
+            <th class="px-4 py-3 text-right font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for t in transactions %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3">
+                {% if t.movement_type == "in" %}
+                  <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">IN</span>
+                {% elif t.movement_type == "out" %}
+                  <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">OUT</span>
+                {% else %}
+                  <span class="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">ADJ</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-slate-500">{{ t.date|date:"d M Y" }}</td>
+              <td class="px-4 py-3 font-mono text-xs">{{ t.reference_number|default:"—" }}</td>
+              <td class="px-4 py-3 text-slate-500">
+                {% for item in t.items.all %}
+                  <div>{{ item.product.sku }} x{{ item.quantity }}</div>
+                {% endfor %}
+              </td>
+              <td class="px-4 py-3 text-slate-500">{{ t.created_by|default:"—" }}</td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'stock:detail' t.pk %}" class="text-emerald-600 hover:underline">View</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <p class="text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+        <div class="flex gap-2">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="rounded-lg border px-3 py-1.5 hover:bg-slate-100">← Prev</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="rounded-lg border px-3 py-1.5 hover:bg-slate-100">Next →</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="card text-center">
+      <p class="py-8 text-slate-500">No transactions yet. Record a <a href="{% url 'stock:in_create' %}" class="text-emerald-600 hover:underline">Stock In</a> or <a href="{% url 'stock:out_create' %}" class="text-red-600 hover:underline">Stock Out</a>.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

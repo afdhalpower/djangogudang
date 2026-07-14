@@ -9,14 +9,20 @@ MENTOR NOTE (Laravel -> Django):
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
-    path("catalog/", include("catalog.urls")),  # categories, units, products
-    path("", include("dashboard.urls")),
-]
+    path("categories/", include("categories.urls")),
+    path("units/", include("units.urls")),
     path("suppliers/", include("suppliers.urls")),
     path("products/", include("products.urls")),
+    path("stock/", include("stock.urls")),
     path("", include("dashboard.urls")),
 ]
+
+# Serve uploaded media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -33,7 +33,8 @@
         <a href="{% url 'units:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Units</a>
         <a href="{% url 'suppliers:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Suppliers</a>
         <a href="{% url 'products:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Products</a>
-        <!-- More links (Stock In/Out, Reports…) get added as modules land -->
+        <a href="{% url 'stock:list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-800">Stock</a>
+        <!-- More links (Reports…) get added as modules land -->
       </nav>
       <div class="px-6 py-4 text-xs text-slate-500 border-t border-slate-800">
         Logged in as <span class="text-slate-300">{{ user.username }}</span>
@@ -47,12 +48,14 @@
         <button class="md:hidden rounded-lg p-2 hover:bg-slate-100" @click="sidebarOpen = !sidebarOpen">☰</button>
         <h1 class="text-base font-semibold">{% block page_title %}Warehouse{% endblock %}</h1>
         <div class="ml-auto flex items-center gap-3 text-sm">
+          {% if user.is_authenticated %}
           <span class="hidden sm:inline text-slate-500">{{ user.get_full_name|default:user.username }}</span>
           <a href="{% url 'accounts:profile' %}" class="rounded-lg px-3 py-1.5 hover:bg-slate-100">Profile</a>
           <form method="post" action="{% url 'accounts:logout' %}" class="inline">
             {% csrf_token %}
             <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700">Logout</button>
           </form>
+          {% endif %}
         </div>
       </header>
 
@@ -76,5 +79,6 @@
       </main>
     </div>
   </div>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

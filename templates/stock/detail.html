@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Transaction #{{ transaction.pk }} · Warehouse{% endblock %}
+{% block page_title %}Transaction #{{ transaction.pk }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl">
+  <div class="card">
+    <div class="mb-4 flex items-start justify-between">
+      <div>
+        <span class="mb-2 inline-block rounded-full px-3 py-1 text-xs font-medium
+          {% if transaction.movement_type == 'in' %}bg-emerald-100 text-emerald-700
+          {% elif transaction.movement_type == 'out' %}bg-red-100 text-red-700
+          {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+          {{ transaction.get_movement_type_display }}
+        </span>
+        <h2 class="text-lg font-semibold">{{ transaction.reference_number|default:"No reference" }}</h2>
+        <p class="text-sm text-slate-500">{{ transaction.date|date:"d M Y" }} · Recorded by {{ transaction.created_by|default:"system" }}</p>
+      </div>
+    </div>
+
+    {% if transaction.notes %}
+      <div class="mb-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">{{ transaction.notes|linebreaks }}</div>
+    {% endif %}
+
+    <h3 class="mb-3 text-sm font-semibold text-slate-700">Items</h3>
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-left text-slate-600">
+        <tr>
+          <th class="rounded-l-lg px-4 py-2 font-medium">Product</th>
+          <th class="px-4 py-2 font-medium">SKU</th>
+          <th class="px-4 py-2 font-medium">Qty</th>
+          <th class="rounded-r-lg px-4 py-2 text-right font-medium">Unit Price</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for item in transaction.items.all %}
+          <tr>
+            <td class="px-4 py-2">{{ item.product.name }}</td>
+            <td class="px-4 py-2 font-mono text-xs text-slate-500">{{ item.product.sku }}</td>
+            <td class="px-4 py-2">{{ item.quantity }}</td>
+            <td class="px-4 py-2 text-right">Rp{{ item.unit_price|floatformat:0 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="mt-6 flex items-center gap-3 border-t pt-4">
+      <a href="{% url 'stock:list' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">← Back</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

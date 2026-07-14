@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     # --- project apps (built feature-by-feature) ---
     "accounts",
     "dashboard",
-    "catalog",  # categories, units, products
+    "categories",
+    "units",
+    "suppliers",
+    "products",
+    "stock",
 ]
 
 MIDDLEWARE = [
