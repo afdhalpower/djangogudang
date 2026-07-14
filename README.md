@@ -100,5 +100,5 @@ djangogudang/
 ## License
 
 Released under the [MIT License](LICENSE).
-© 2026 Afdhal Rizaldi.
+© 2026 afdhalpower.
 
