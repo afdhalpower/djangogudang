@@ -9,4 +9,5 @@ urlpatterns = [
     path("<int:pk>/", views.ProductDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.ProductUpdateView.as_view(), name="update"),
     path("<int:pk>/delete/", views.ProductDeleteView.as_view(), name="delete"),
+    path("<int:pk>/barcode/print/", views.ProductBarcodePrintView.as_view(), name="barcode_print"),
 ]

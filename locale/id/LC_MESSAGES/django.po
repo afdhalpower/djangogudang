@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 09:48+0700\n"
+"POT-Creation-Date: 2026-07-15 10:04+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,14 +35,24 @@ msgid "Bahasa Indonesia"
 msgstr "Bahasa Indonesia"
 
 #: dashboard/views.py:88
+#, fuzzy
+#| msgid "Suppliers"
+msgid "No Supplier"
+msgstr "Pemasok"
+
+#: dashboard/views.py:94
+msgid "Others"
+msgstr ""
+
+#: dashboard/views.py:119
 msgid "Healthy"
 msgstr "Sehat"
 
-#: dashboard/views.py:89 templates/base.html:154
+#: dashboard/views.py:120 templates/base.html:154
 msgid "Low Stock"
 msgstr "Stok Rendah"
 
-#: dashboard/views.py:90 templates/dashboard/home.html:32
+#: dashboard/views.py:121 templates/dashboard/home.html:32
 #: templates/products/list.html:23
 msgid "Inactive"
 msgstr "Nonaktif"
@@ -162,6 +172,14 @@ msgstr "Penyesuaian"
 msgid "Stock Health"
 msgstr "Kesehatan Stok"
 
+#: templates/dashboard/home.html:97
+msgid "Supplier Value Share"
+msgstr "Nilai per Pemasok"
+
+#: templates/products/detail.html:26
+msgid "Print Barcode Label"
+msgstr "Cetak Label Barcode"
+
 #: templates/products/list.html:21
 msgid "All Status"
 msgstr "Semua Status"
@@ -210,41 +228,43 @@ msgstr "Status"
 msgid "Actions"
 msgstr "Aksi"
 
-#: templates/reports/low_stock.html:64
+#: templates/reports/low_stock.html:67
 msgid "Reorder Recommendations"
 msgstr "Rekomendasi Pemesanan Ulang"
 
-#: templates/reports/low_stock.html:81
+#: templates/reports/low_stock.html:84
 msgid "Generate Email Draft"
 msgstr "Buat Draf Email"
 
-#: templates/reports/low_stock.html:92
+#: templates/reports/low_stock.html:95
 msgid "Reorder Email Draft"
 msgstr "Draf Email Pemesanan Ulang"
 
-#: templates/reports/low_stock.html:97
+#: templates/reports/low_stock.html:100
 msgid "Recipient Email"
 msgstr "Email Penerima"
 
-#: templates/reports/low_stock.html:101
+#: templates/reports/low_stock.html:104
 msgid "Subject"
 msgstr "Subjek"
 
-#: templates/reports/low_stock.html:105
+#: templates/reports/low_stock.html:108
 msgid "Message Body"
 msgstr "Isi Pesan"
 
-#: templates/reports/low_stock.html:111
+#: templates/reports/low_stock.html:114
 msgid "Copy Draft"
 msgstr "Salin Draf"
 
-#: templates/reports/low_stock.html:114
+#: templates/reports/low_stock.html:117
 msgid "Close"
 msgstr "Tutup"
 
 #: templates/settings_app/activity_logs.html:12
 msgid "System audit trail showing recent actions performed by users."
-msgstr "Audit trail sistem yang menampilkan tindakan terbaru yang dilakukan oleh pengguna."
+msgstr ""
+"Audit trail sistem yang menampilkan tindakan terbaru yang dilakukan oleh "
+"pengguna."
 
 #: templates/settings_app/activity_logs.html:15
 msgid "Print"

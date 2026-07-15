@@ -14,6 +14,10 @@ from products.models import Product
 from stock.models import StockTransaction, StockTransactionItem
 from suppliers.models import Supplier
 
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+
 
 # ─── Helpers ───────────────────────────────────────────────────
 
@@ -25,6 +29,64 @@ def _csv_response(filename: str, header: list, rows: list) -> HttpResponse:
     writer.writerows(rows)
     response = HttpResponse(buf.getvalue(), content_type="text/csv; charset=utf-8")
     response["Content-Disposition"] = f'attachment; filename="{filename}.csv"'
+    return response
+
+
+def _xlsx_response(filename: str, header: list, rows: list) -> HttpResponse:
+    """Return an HttpResponse with formatted Excel sheet content using emerald theme."""
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Report"
+    
+    header_font = Font(name="Arial", size=11, bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="059669", end_color="059669", fill_type="solid")
+    data_font = Font(name="Arial", size=10)
+    
+    thin_border = Border(
+        left=Side(style='thin', color='E2E8F0'),
+        right=Side(style='thin', color='E2E8F0'),
+        top=Side(style='thin', color='E2E8F0'),
+        bottom=Side(style='thin', color='E2E8F0')
+    )
+    
+    left_align = Alignment(horizontal="left", vertical="center")
+    right_align = Alignment(horizontal="right", vertical="center")
+    
+    ws.append(header)
+    for col_num in range(1, len(header) + 1):
+        cell = ws.cell(row=1, column=col_num)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = left_align
+        cell.border = thin_border
+    
+    for row_num, row_data in enumerate(rows, start=2):
+        ws.append(row_data)
+        for col_num in range(1, len(row_data) + 1):
+            cell = ws.cell(row=row_num, column=col_num)
+            cell.font = data_font
+            cell.border = thin_border
+            
+            val = cell.value
+            if isinstance(val, (int, float)):
+                cell.number_format = '#,##0'
+                cell.alignment = right_align
+            elif str(val).startswith("Rp") or str(val).isdigit():
+                cell.alignment = right_align
+            else:
+                cell.alignment = left_align
+    
+    for col in ws.columns:
+        max_len = 0
+        col_letter = get_column_letter(col[0].column)
+        for cell in col:
+            if cell.value:
+                max_len = max(max_len, len(str(cell.value)))
+        ws.column_dimensions[col_letter].width = max(max_len + 3, 10)
+        
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = f'attachment; filename="{filename}.xlsx"'
+    wb.save(response)
     return response
 
 
@@ -96,6 +158,30 @@ def inventory_csv(request):
             p.status,
         ])
     return _csv_response(
+        "inventory_report",
+        ["SKU", "Name", "Category", "Unit", "Stock", "Min", "Supplier",
+         "Purchase Price", "Selling Price", "Inventory Value", "Status"],
+        rows,
+    )
+
+
+@login_required
+def inventory_xlsx(request):
+    """Export Inventory Report as Excel."""
+    products = Product.objects.select_related("category", "unit", "supplier").all()
+    rows = []
+    for p in products:
+        rows.append([
+            p.sku, p.name, p.category.name if p.category else "",
+            p.unit.abbreviation if p.unit else "",
+            p.current_stock, p.minimum_stock,
+            p.supplier.company_name if p.supplier else "",
+            _format_rp(p.purchase_price),
+            _format_rp(p.selling_price),
+            _format_rp(p.current_stock * p.purchase_price),
+            p.status,
+        ])
+    return _xlsx_response(
         "inventory_report",
         ["SKU", "Name", "Category", "Unit", "Stock", "Min", "Supplier",
          "Purchase Price", "Selling Price", "Inventory Value", "Status"],
@@ -175,6 +261,31 @@ def low_stock_csv(request):
     )
 
 
+@login_required
+def low_stock_xlsx(request):
+    """Export Low Stock Report as Excel."""
+    products = Product.objects.filter(
+        current_stock__lte=F("minimum_stock")
+    ).select_related("category", "unit", "supplier").order_by("current_stock")
+    rows = []
+    for p in products:
+        rows.append([
+            p.sku, p.name, p.category.name if p.category else "",
+            p.unit.abbreviation if p.unit else "",
+            p.current_stock, p.minimum_stock,
+            p.supplier.company_name if p.supplier else "",
+            _format_rp(p.purchase_price),
+            _format_rp(p.selling_price),
+            p.status,
+        ])
+    return _xlsx_response(
+        "low_stock_report",
+        ["SKU", "Name", "Category", "Unit", "Stock", "Min", "Supplier",
+         "Purchase Price", "Selling Price", "Status"],
+        rows,
+    )
+
+
 # ─── Stock Card ────────────────────────────────────────────────
 
 class StockCardView(LoginRequiredMixin, TemplateView):
@@ -241,6 +352,38 @@ def stock_card_csv(request):
         ])
 
     return _csv_response(
+        f"stock_card_{product.sku}",
+        ["Date", "Reference", "Type", "Direction", "Qty", "Unit Price"],
+        rows,
+    )
+
+
+@login_required
+def stock_card_xlsx(request):
+    """Export Stock Card for a specific product as Excel."""
+    product_id = request.GET.get("product", "")
+    if not product_id or not product_id.isdigit():
+        return HttpResponse("Select a valid product first", status=400)
+
+    product = get_object_or_404(Product, pk=int(product_id))
+    items = StockTransactionItem.objects.filter(
+        product=product
+    ).select_related("transaction").order_by("transaction__date")
+
+    rows = []
+    for item in items:
+        movement = item.transaction.movement_type
+        direction = item.transaction.adjustment_direction if movement == "adjustment" else ""
+        rows.append([
+            item.transaction.date.strftime("%Y-%m-%d") if item.transaction.date else "",
+            item.transaction.reference_number or "",
+            movement.upper(),
+            direction,
+            item.quantity,
+            _format_rp(item.unit_price),
+        ])
+
+    return _xlsx_response(
         f"stock_card_{product.sku}",
         ["Date", "Reference", "Type", "Direction", "Qty", "Unit Price"],
         rows,

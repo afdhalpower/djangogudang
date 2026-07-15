@@ -45,7 +45,24 @@
         </div>
       </div>
 
-      <button type="button" id="add-row" class="mt-2 rounded-lg border border-emerald-300 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-50">+ Add another item</button>
+      <div class="mt-2 flex items-center gap-2">
+        <button type="button" id="add-row" class="rounded-lg border border-emerald-300 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-50">+ Add another item</button>
+        <button type="button" id="start-scan" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-1.5">
+          {% icon 'camera' 14 'h-3.5 w-3.5' %} Scan Barcode
+        </button>
+      </div>
+
+      <!-- Scanner Modal -->
+      <div id="scanner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 hidden">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl relative">
+          <div class="mb-4 flex items-center justify-between border-b pb-3">
+            <h3 class="text-base font-bold text-slate-800">Scan Barcode</h3>
+            <button type="button" id="close-scanner" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+          </div>
+          <div id="interactive" class="w-full overflow-hidden rounded bg-slate-100 min-h-[250px]"></div>
+          <div class="mt-4 text-xs text-slate-500 text-center">Arahkan barcode produk ke kamera.</div>
+        </div>
+      </div>
 
       <div class="mt-6 flex items-center gap-3 border-t pt-4">
         <button type="submit" class="btn-primary">Record Stock Out</button>
@@ -57,6 +74,7 @@
 
 {% endblock %}
 {% block extra_js %}
+<script src="{% static 'vendor/html5-qrcode.min.js' %}"></script>
 <script>
   document.getElementById('add-row')?.addEventListener('click', function() {
     const container = document.getElementById('items-container');
@@ -69,5 +87,74 @@
     clone.querySelector('input[name="quantity"]').value = '1';
     container.appendChild(clone);
   });
+
+  let html5QrcodeScanner = null;
+
+  document.getElementById('start-scan')?.addEventListener('click', function() {
+    document.getElementById('scanner-modal').classList.remove('hidden');
+    
+    html5QrcodeScanner = new Html5Qrcode("interactive");
+    
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+      stopScanner();
+      
+      const selectElements = document.querySelectorAll('select[name="product_id"]');
+      if (selectElements.length > 0) {
+        fetch('/search/json/?q=' + encodeURIComponent(decodedText))
+          .then(res => res.json())
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              const matchedProd = data.results.find(r => r.type === 'product');
+              if (matchedProd) {
+                let targetSelect = null;
+                for (let sel of selectElements) {
+                  if (sel.value === '') {
+                    targetSelect = sel;
+                    break;
+                  }
+                }
+                
+                if (!targetSelect) {
+                  document.getElementById('add-row').click();
+                  const newSelects = document.querySelectorAll('select[name="product_id"]');
+                  targetSelect = newSelects[newSelects.length - 1];
+                }
+                
+                const parts = matchedProd.url.split('/').filter(Boolean);
+                const pk = parts[parts.length - 1];
+                
+                if (pk) {
+                  targetSelect.value = pk;
+                }
+              } else {
+                alert('Product with barcode "' + decodedText + '" not found.');
+              }
+            } else {
+              alert('Product with barcode "' + decodedText + '" not found.');
+            }
+          });
+      }
+    };
+    
+    const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+    
+    html5QrcodeScanner.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+      .catch(err => {
+        alert("Gagal mengaktifkan kamera: " + err);
+        stopScanner();
+      });
+  });
+
+  document.getElementById('close-scanner')?.addEventListener('click', function() {
+    stopScanner();
+  });
+
+  function stopScanner() {
+    document.getElementById('scanner-modal').classList.add('hidden');
+    if (html5QrcodeScanner) {
+      html5QrcodeScanner.stop().catch(err => console.log('Error stopping scanner: ', err));
+      html5QrcodeScanner = null;
+    }
+  }
 </script>
 {% endblock %}

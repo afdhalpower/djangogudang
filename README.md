@@ -45,6 +45,10 @@ A modern, professional warehouse inventory management system built with Django 5
 - [x] **Audit Trail (Activity Logs)** — paginated system audit logs showing user, timestamp, actions, and details
 - [x] **Active Status Guards** — safety filters and validations restricting choices/transactions on inactive products, categories, units, and suppliers
 - [x] **Reorder Recommendations** — automated shortage calculation and pre-formatted email draft templates grouped by supplier with one-click copy
+- [x] **Visual Barcode & Sticker Sheet Printing** — dynamic SVG barcode generation (CODE128) on detail page and print-friendly sticker sheets
+- [x] **Webcam Barcode Scanner** — real-time webcam scanning via WebRTC (`html5-qrcode`) for quick product selection during transactions
+- [x] **Styled Excel Exports (.xlsx)** — polished spreadsheet generator (`openpyxl`) with emerald headers, auto-fit widths, and proper currency formats
+- [x] **Supplier Share Analytics** — visual dashboard doughnut chart depicting inventory value share per supplier
 
 ## Screenshot
 

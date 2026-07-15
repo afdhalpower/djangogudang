@@ -98,3 +98,10 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
         from core.utils import log_activity
         log_activity(self.request.user, "Deleted Product", f"SKU: {self.get_object().sku}, Name: {self.get_object().name}")
         return super().form_valid(form)
+
+
+class ProductBarcodePrintView(LoginRequiredMixin, DetailView):
+    """View to display and print barcode sheet for a product."""
+    model = Product
+    template_name = "products/barcode_print.html"
+    context_object_name = "product"

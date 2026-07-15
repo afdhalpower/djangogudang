@@ -36,6 +36,8 @@
       </button>
       <a href="{% url 'reports:stock_card_csv' %}?product={{ selected_product.pk }}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
          class="rounded-lg border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Export CSV</a>
+      <a href="{% url 'reports:stock_card_xlsx' %}?product={{ selected_product.pk }}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
+         class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Export Excel</a>
     {% endif %}
   </form>
 

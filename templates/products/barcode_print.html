@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Cetak Barcode - {{ product.name }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-4xl no-print mb-4 flex items-center justify-between">
+  <h2 class="text-lg font-bold">Cetak Label Barcode - {{ product.name }}</h2>
+  <div class="flex gap-2">
+    <button onclick="window.print()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Print</button>
+    <a href="{{ product.get_absolute_url }}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Kembali</a>
+  </div>
+</div>
+<div class="grid grid-cols-3 gap-6 p-6 bg-white border border-slate-200 rounded-xl" id="barcode-grid">
+  {% for i in "123456789012"|make_list %}
+    <div class="border border-dashed border-slate-300 p-4 flex flex-col items-center justify-center bg-white text-center rounded">
+      <span class="text-xs font-bold text-slate-800 truncate w-full">{{ product.name }}</span>
+      <svg class="barcode-item mt-1" data-value="{{ product.barcode|default:product.sku }}"></svg>
+      <span class="text-[10px] text-slate-500 mt-1">Rp{{ product.selling_price|floatformat:0 }}</span>
+    </div>
+  {% endfor %}
+</div>
+<script src="{% static 'vendor/JsBarcode.all.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".barcode-item").forEach(function(el) {
+      JsBarcode(el, el.getAttribute("data-value"), {
+        format: "CODE128",
+        width: 1.2,
+        height: 40,
+        displayValue: true,
+        fontSize: 10
+      });
+    });
+    setTimeout(function() { window.print(); }, 500);
+  });
+</script>
+{% endblock %}

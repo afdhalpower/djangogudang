@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, Q
+from django.db.models import F, Q, Count, Sum, ExpressionWrapper, DecimalField
 from django.utils import timezone
 from django.views.generic import TemplateView
 from products.models import Product
@@ -71,6 +71,37 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
         health_labels = ["Healthy", "Low Stock", "Inactive"]
         health_data = [healthy, low, inactive]
 
+        # Supplier Analytics
+        supplier_data = Product.objects.filter(status="active").values("supplier__company_name").annotate(
+            total_items=Count("id"),
+            total_value=Sum(ExpressionWrapper(F("current_stock") * F("purchase_price"), output_field=DecimalField()))
+        ).order_by("-total_value")
+
+        supplier_labels = []
+        supplier_values = []
+        supplier_colors = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#6b7280"]
+        
+        top_suppliers = list(supplier_data[:5])
+        other_value = sum(item["total_value"] or 0 for item in supplier_data[5:])
+        
+        for item in top_suppliers:
+            name = item["supplier__company_name"] or _("No Supplier")
+            val = float(item["total_value"] or 0)
+            supplier_labels.append(name)
+            supplier_values.append(val)
+            
+        if other_value > 0:
+            supplier_labels.append(str(_("Others")))
+            supplier_values.append(float(other_value))
+
+        supplier_share = []
+        for i in range(len(supplier_labels)):
+            supplier_share.append({
+                "label": supplier_labels[i],
+                "value": supplier_values[i],
+                "color": supplier_colors[i]
+            })
+
         context.update(
             total_products=total_products,
             low_stock=low_stock,
@@ -89,6 +120,10 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
                     {"label": _("Low Stock"), "value": low, "color": "#dc2626"},
                     {"label": _("Inactive"), "value": inactive, "color": "#94a3b8"},
                 ],
+                supplier_labels=supplier_labels,
+                supplier_values=supplier_values,
+                supplier_colors=supplier_colors[:len(supplier_labels)],
+                supplier_share=supplier_share,
             ),
         )
         return context
