@@ -1,5 +1,6 @@
 """
 Stock views — Stock In, Stock Out, and Stock Adjustment with line items.
+Includes batch/expiry tracking and FEFO (First Expired First Out) logic.
 """
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -11,7 +12,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib import messages
 from decimal import Decimal, InvalidOperation
-from .models import StockTransaction, StockTransactionItem
+from .models import StockTransaction, StockTransactionItem, ProductBatch
 from .forms import StockInForm, StockOutForm, StockAdjustmentForm
 from products.models import Product
 
@@ -38,6 +39,10 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
             prices = ["0"] * len(products_ids)
         elif len(prices) < len(products_ids):
             prices = list(prices) + ["0"] * (len(products_ids) - len(prices))
+
+        # Batch/expiry fields (only relevant for Stock In)
+        batch_numbers = self.request.POST.getlist("batch_number")
+        expiry_dates = self.request.POST.getlist("expiry_date")
 
         rows = []
         for i, (pid, qty, price) in enumerate(zip(products_ids, quantities, prices)):
@@ -80,7 +85,11 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
                 messages.error(self.request, f"Product ID {pid} does not exist.")
                 return redirect(self.request.path)
 
-            rows.append((int(pid), qty_val, price_val))
+            # Collect batch info if provided
+            batch_num = batch_numbers[i].strip() if i < len(batch_numbers) else ""
+            expiry_str = expiry_dates[i].strip() if i < len(expiry_dates) else ""
+
+            rows.append((int(pid), qty_val, price_val, batch_num, expiry_str))
 
         if not rows:
             messages.error(self.request, "Please add at least one product item.")
@@ -93,12 +102,40 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
                 transaction.created_by = self.request.user
                 transaction.save()
 
-                for pid, qty, price in rows:
+                for pid, qty, price, batch_num, expiry_str in rows:
+                    batch_obj = None
+
+                    if self.movement_type == StockTransaction.MOVEMENT_IN and batch_num:
+                        # Parse expiry date if provided
+                        expiry_date = None
+                        if expiry_str:
+                            from datetime import datetime
+                            try:
+                                expiry_date = datetime.strptime(expiry_str, "%Y-%m-%d").date()
+                            except ValueError:
+                                pass  # Silently skip invalid dates
+
+                        # Get or create the batch
+                        batch_obj, _created = ProductBatch.objects.get_or_create(
+                            product_id=pid,
+                            batch_number=batch_num,
+                            defaults={"expiry_date": expiry_date},
+                        )
+                        # If batch already exists but expiry was updated
+                        if not _created and expiry_date and not batch_obj.expiry_date:
+                            batch_obj.expiry_date = expiry_date
+                            batch_obj.save(update_fields=["expiry_date"])
+
+                    elif self.movement_type == StockTransaction.MOVEMENT_OUT:
+                        # FEFO: auto-pick the batch with earliest expiry that has stock
+                        batch_obj = self._fefo_pick_batch(pid, qty)
+
                     StockTransactionItem.objects.create(
                         transaction=transaction,
                         product_id=pid,
                         quantity=qty,
                         unit_price=price,
+                        batch=batch_obj,
                     )
 
                 from core.utils import log_activity
@@ -114,6 +151,26 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
 
         messages.success(self.request, self.success_message)
         return redirect(transaction.get_absolute_url())
+
+    def _fefo_pick_batch(self, product_id, qty):
+        """
+        FEFO (First Expired First Out): Find the batch with the earliest
+        expiry date that still has remaining stock for this product.
+        Returns a ProductBatch or None if no batches exist.
+        """
+        # Order: expiry_date ASC (NULL last), then created_at ASC
+        from django.db.models import F
+        batch = (
+            ProductBatch.objects
+            .filter(product_id=product_id, current_stock__gt=0)
+            .order_by(
+                # Batches with expiry_date come first (NULLS LAST)
+                F("expiry_date").asc(nulls_last=True),
+                "created_at",
+            )
+            .first()
+        )
+        return batch
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -198,5 +255,5 @@ class StockTransactionDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return StockTransaction.objects.prefetch_related(
-            "items", "items__product", "items__product__unit"
+            "items", "items__product", "items__product__unit", "items__batch"
         )

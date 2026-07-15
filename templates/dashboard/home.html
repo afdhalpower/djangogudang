@@ -9,6 +9,29 @@
 <div class="mx-auto max-w-7xl space-y-6">
   {{ chart|json_script:"chart-data" }}
 
+  <!-- Date Range Filter -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-lg font-bold text-slate-800">{% translate "Overview" %}</h2>
+    <div class="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
+      <a href="?days=7"
+         class="rounded-md px-3 py-1.5 text-xs font-medium transition-all {% if active_days == '7' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+        7 {% translate "Days" %}
+      </a>
+      <a href="?days=30"
+         class="rounded-md px-3 py-1.5 text-xs font-medium transition-all {% if active_days == '30' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+        30 {% translate "Days" %}
+      </a>
+      <a href="?days=90"
+         class="rounded-md px-3 py-1.5 text-xs font-medium transition-all {% if active_days == '90' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+        90 {% translate "Days" %}
+      </a>
+      <a href="?days=365"
+         class="rounded-md px-3 py-1.5 text-xs font-medium transition-all {% if active_days == '365' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-600 hover:bg-slate-100{% endif %}">
+        1 {% translate "Year" %}
+      </a>
+    </div>
+  </div>
+
   <!-- Stat cards row -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
     <div class="card flex items-center gap-4">
@@ -55,7 +78,7 @@
       <div class="mb-4 flex items-center justify-between">
         <h2 class="flex items-center gap-2 text-sm font-semibold text-slate-700">
           {% icon 'chart' 18 'h-4 w-4 text-emerald-600' %}
-          {% translate "Stock Movement (14 days)" %}
+          {% translate "Stock Movement" %} ({{ active_days }} {% translate "Days" %})
         </h2>
         <div class="flex items-center gap-3 text-xs text-slate-500">
           <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> {% translate "In" %}</span>
@@ -114,6 +137,95 @@
           {% endfor %}
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Expiring Batches Alert + Fast-Moving Items -->
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+    <!-- Expiring Batches -->
+    <div class="card !p-0">
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <h2 class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          {% translate "Expiring Soon" %} (<30 {% translate "Days" %})
+        </h2>
+      </div>
+      {% if expiring_batches %}
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-left text-slate-600">
+            <tr>
+              <th class="px-5 py-2.5 font-medium">{% translate "Product" %}</th>
+              <th class="px-5 py-2.5 font-medium">{% translate "Batch" %}</th>
+              <th class="px-5 py-2.5 font-medium">{% translate "Expiry" %}</th>
+              <th class="px-5 py-2.5 font-medium">{% translate "Stock" %}</th>
+              <th class="px-5 py-2.5 font-medium">{% translate "Status" %}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for b in expiring_batches %}
+              <tr class="hover:bg-slate-50">
+                <td class="px-5 py-2.5 font-medium">{{ b.product.name }}</td>
+                <td class="px-5 py-2.5 font-mono text-xs text-slate-500">{{ b.batch_number }}</td>
+                <td class="px-5 py-2.5 text-xs">{{ b.expiry_date|date:"d M Y" }}</td>
+                <td class="px-5 py-2.5">{{ b.current_stock }}</td>
+                <td class="px-5 py-2.5">
+                  {% if b.is_expired %}
+                    <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">{% translate "Expired" %}</span>
+                  {% elif b.days_until_expiry <= 7 %}
+                    <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">{{ b.days_until_expiry }}d</span>
+                  {% else %}
+                    <span class="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">{{ b.days_until_expiry }}d</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="px-5 py-8 text-center text-sm text-slate-500">
+          {% translate "No batches expiring within 30 days" %}
+          {% icon 'check' 16 'h-4 w-4 inline text-emerald-500' %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Top Fast-Moving Items -->
+    <div class="card !p-0">
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <h2 class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <svg class="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          {% translate "Top 5 Fast-Moving Items" %} ({{ active_days }}d)
+        </h2>
+      </div>
+      {% if top_moving_items %}
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-left text-slate-600">
+            <tr>
+              <th class="px-5 py-2.5 font-medium w-8">#</th>
+              <th class="px-5 py-2.5 font-medium">{% translate "Product" %}</th>
+              <th class="px-5 py-2.5 font-medium">{% translate "SKU" %}</th>
+              <th class="px-5 py-2.5 font-medium text-right">{% translate "Total Out" %}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for item in top_moving_items %}
+              <tr class="hover:bg-slate-50">
+                <td class="px-5 py-2.5 text-slate-400 font-mono text-xs">{{ forloop.counter }}</td>
+                <td class="px-5 py-2.5 font-medium">{{ item.product__name }}</td>
+                <td class="px-5 py-2.5 font-mono text-xs text-slate-500">{{ item.product__sku }}</td>
+                <td class="px-5 py-2.5 text-right">
+                  <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">{{ item.total_out }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="px-5 py-8 text-center text-sm text-slate-500">
+          {% translate "No outgoing transactions in this period" %}
+        </div>
+      {% endif %}
     </div>
   </div>
 
