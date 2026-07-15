@@ -71,6 +71,15 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
                 messages.error(self.request, f"Invalid unit price format at line {i+1}.")
                 return redirect(self.request.path)
 
+            try:
+                product = Product.objects.get(pk=int(pid))
+                if product.status != "active":
+                    messages.error(self.request, f"Product {product.name} is inactive and cannot be used in transactions.")
+                    return redirect(self.request.path)
+            except Product.DoesNotExist:
+                messages.error(self.request, f"Product ID {pid} does not exist.")
+                return redirect(self.request.path)
+
             rows.append((int(pid), qty_val, price_val))
 
         if not rows:
@@ -91,6 +100,13 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
                         quantity=qty,
                         unit_price=price,
                     )
+
+                from core.utils import log_activity
+                log_activity(
+                    self.request.user,
+                    f"Recorded {transaction.get_movement_type_display()}",
+                    f"Ref: {transaction.reference_number}, items: {len(rows)}"
+                )
 
         except ValidationError as e:
             messages.error(self.request, ", ".join(e.messages))

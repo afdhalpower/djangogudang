@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 from products.models import Product
 from stock.models import StockTransaction, StockTransactionItem
+from django.utils.translation import gettext_lazy as _
 
 
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
@@ -84,9 +85,9 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
                 trend_out=trend_out,
                 trend_adj=trend_adj,
                 health=[
-                    {"label": "Healthy", "value": healthy, "color": "#059669"},
-                    {"label": "Low Stock", "value": low, "color": "#dc2626"},
-                    {"label": "Inactive", "value": inactive, "color": "#94a3b8"},
+                    {"label": _("Healthy"), "value": healthy, "color": "#059669"},
+                    {"label": _("Low Stock"), "value": low, "color": "#dc2626"},
+                    {"label": _("Inactive"), "value": inactive, "color": "#94a3b8"},
                 ],
             ),
         )

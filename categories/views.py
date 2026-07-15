@@ -29,12 +29,24 @@ class CategoryCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = "categories/form.html"
     success_message = "Category created successfully."
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Created Category", f"Name: {self.object.name}")
+        return response
+
 
 class CategoryUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Category
     form_class = CategoryForm
     template_name = "categories/form.html"
     success_message = "Category updated successfully."
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Updated Category", f"Name: {self.object.name}, Status: {self.object.status}")
+        return response
 
 
 class CategoryDeleteView(LoginRequiredMixin, DeleteView):
@@ -46,4 +58,6 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     def form_valid(self, form):
         from django.contrib import messages
         messages.success(self.request, self.success_message)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Deleted Category", f"Name: {self.get_object().name}")
         return super().form_valid(form)

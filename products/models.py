@@ -1,6 +1,7 @@
 """
 Product model — the core entity of the warehouse system.
 """
+import random
 from django.db import models
 from django.urls import reverse
 from decimal import Decimal
@@ -24,7 +25,7 @@ class Product(models.Model):
 
     # Core identity
     sku = models.CharField(
-        max_length=50, unique=True, db_index=True,
+        max_length=50, unique=True, db_index=True, blank=True,
         verbose_name="SKU",
         help_text="Stock Keeping Unit — unique product code",
     )
@@ -111,3 +112,30 @@ class Product(models.Model):
             return round((self.selling_price - self.purchase_price)
                          / self.purchase_price * 100, 1)
         return Decimal("0.0")
+
+    def save(self, *args, **kwargs):
+        if not self.sku:
+            # Generate SKU: prefix based on category (first 3 letters uppercase)
+            prefix = "".join(c for c in self.category.name if c.isalnum()).upper()[:3]
+            if len(prefix) < 3:
+                prefix = (prefix + "PRD")[:3]
+            
+            count = Product.objects.filter(sku__startswith=f"{prefix}-").count()
+            sequence = count + 1
+            new_sku = f"{prefix}-{sequence:04d}"
+            
+            while Product.objects.filter(sku=new_sku).exists():
+                sequence += 1
+                new_sku = f"{prefix}-{sequence:04d}"
+            
+            self.sku = new_sku
+
+        if not self.barcode:
+            while True:
+                random_suffix = "".join(str(random.randint(0, 9)) for _ in range(9))
+                potential_barcode = f"888{random_suffix}"
+                if not Product.objects.filter(barcode=potential_barcode).exists():
+                    self.barcode = potential_barcode
+                    break
+
+        super().save(*args, **kwargs)

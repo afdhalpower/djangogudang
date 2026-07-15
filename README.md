@@ -6,10 +6,6 @@
 
 A modern, professional warehouse inventory management system built with Django 5 — designed for small-to-medium businesses.
 
-## Learning Mode
-
-Built feature-by-feature as a teaching project for a Laravel developer transitioning to Django. Every commit includes architecture decisions, Django best practices, and Laravel analogies.
-
 ## Technology Stack
 
 | Layer | Technology |
@@ -43,6 +39,12 @@ Built feature-by-feature as a teaching project for a Laravel developer transitio
 - [x] **Notifications** — computed low-stock alerts (critical/warning), severity cards with inline Stock In action
 - [x] **Global Search** — unified search across products (name/SKU/barcode), suppliers (company/contact), transactions (reference)
 - [x] **Settings** — company profile, warehouse info, preferences (low-stock threshold, currency), single-row model singleton pattern
+- [x] **Multi-Language Support (i18n)** — dynamic switching between English & Bahasa Indonesia on any page, saved in user sessions/cookies
+- [x] **Auto-SKU & Barcode Generation** — automatic sequential SKU generation based on category prefix (e.g. `ELE-0004`) and unique UPC barcode if left empty
+- [x] **Print-Friendly Pages** — print-optimized layout stylesheet (`@media print`) and inline print buttons for all reports and transactions
+- [x] **Audit Trail (Activity Logs)** — paginated system audit logs showing user, timestamp, actions, and details
+- [x] **Active Status Guards** — safety filters and validations restricting choices/transactions on inactive products, categories, units, and suppliers
+- [x] **Reorder Recommendations** — automated shortage calculation and pre-formatted email draft templates grouped by supplier with one-click copy
 
 ## Screenshot
 

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load icons %}
-{% block title %}Products · Warehouse{% endblock %}
-{% block page_title %}Products{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Products" %} · Warehouse{% endblock %}
+{% block page_title %}{% translate "Products" %}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl">
@@ -17,22 +18,22 @@
         </span>
       </div>
       <select name="status" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-        <option value="">All Status</option>
-        <option value="active" {% if filter_status == "active" %}selected{% endif %}>Active</option>
-        <option value="inactive" {% if filter_status == "inactive" %}selected{% endif %}>Inactive</option>
+        <option value="">{% translate "All Status" %}</option>
+        <option value="active" {% if filter_status == "active" %}selected{% endif %}>{% translate "Active" %}</option>
+        <option value="inactive" {% if filter_status == "inactive" %}selected{% endif %}>{% translate "Inactive" %}</option>
       </select>
       <select name="category" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-        <option value="">All Categories</option>
+        <option value="">{% translate "All Categories" %}</option>
         {% for cat in categories %}
           <option value="{{ cat.pk }}" {% if filter_category == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
         {% endfor %}
       </select>
-      <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filter</button>
+      <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">{% translate "Filter" %}</button>
       {% if q or filter_status or filter_category %}
-        <a href="{% url 'products:list' %}" class="text-sm text-slate-500 hover:underline">Clear</a>
+        <a href="{% url 'products:list' %}" class="text-sm text-slate-500 hover:underline">{% translate "Clear" %}</a>
       {% endif %}
     </form>
-    <a href="{% url 'products:create' %}" class="btn-primary">+ New Product</a>
+    <a href="{% url 'products:create' %}" class="btn-primary">+ {% translate "New Product" %}</a>
   </div>
 
   <p class="mb-3 text-sm text-slate-500">{{ page_obj.paginator.count }} product{{ page_obj.paginator.count|pluralize }}</p>
@@ -42,13 +43,13 @@
       <table class="w-full text-sm">
         <thead class="bg-slate-50 text-left text-slate-600">
           <tr>
-            <th class="px-4 py-3 font-medium">SKU</th>
-            <th class="px-4 py-3 font-medium">Name</th>
-            <th class="px-4 py-3 font-medium">Category</th>
-            <th class="px-4 py-3 font-medium">Stock</th>
-            <th class="px-4 py-3 font-medium">Price</th>
-            <th class="px-4 py-3 font-medium">Status</th>
-            <th class="px-4 py-3 text-right font-medium">Actions</th>
+            <th class="px-4 py-3 font-medium">{% translate "SKU" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Name" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Category" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Stock" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Price" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Status" %}</th>
+            <th class="px-4 py-3 text-right font-medium">{% translate "Actions" %}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">

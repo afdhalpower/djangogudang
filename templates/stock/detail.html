@@ -16,6 +16,9 @@
         <h2 class="text-lg font-semibold">{{ transaction.reference_number|default:"No reference" }}</h2>
         <p class="text-sm text-slate-500">{{ transaction.date|date:"d M Y" }} · Recorded by {{ transaction.created_by|default:"system" }}</p>
       </div>
+      <button onclick="window.print()" class="no-print rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-1.5">
+        {% icon 'document' 16 'h-4 w-4' %} Print
+      </button>
     </div>
 
     {% if transaction.notes %}

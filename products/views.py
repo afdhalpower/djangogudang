@@ -67,12 +67,24 @@ class ProductCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = "products/form.html"
     success_message = "Product created successfully."
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Created Product", f"SKU: {self.object.sku}, Name: {self.object.name}")
+        return response
+
 
 class ProductUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = "products/form.html"
     success_message = "Product updated successfully."
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Updated Product", f"SKU: {self.object.sku}, Name: {self.object.name}, Status: {self.object.status}")
+        return response
 
 
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
@@ -83,4 +95,6 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Deleted Product", f"SKU: {self.get_object().sku}, Name: {self.get_object().name}")
         return super().form_valid(form)

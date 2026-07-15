@@ -26,12 +26,24 @@ class SupplierCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = "suppliers/form.html"
     success_message = "Supplier created successfully."
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Created Supplier", f"Company: {self.object.company_name}")
+        return response
+
 
 class SupplierUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Supplier
     form_class = SupplierForm
     template_name = "suppliers/form.html"
     success_message = "Supplier updated successfully."
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Updated Supplier", f"Company: {self.object.company_name}, Status: {self.object.status}")
+        return response
 
 
 class SupplierDeleteView(LoginRequiredMixin, DeleteView):
@@ -42,4 +54,6 @@ class SupplierDeleteView(LoginRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Deleted Supplier", f"Company: {self.get_object().company_name}")
         return super().form_valid(form)

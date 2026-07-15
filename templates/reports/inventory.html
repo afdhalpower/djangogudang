@@ -11,7 +11,12 @@
       <span class="text-emerald-600 font-medium">Rp{{ total_selling_value|floatformat:0 }} selling value</span>
       <span class="{% if low_stock_count > 0 %}text-red-600{% else %}text-slate-500{% endif %} font-medium">{{ low_stock_count }} low stock</span>
     </div>
-    <a href="{% url 'reports:inventory_csv' %}" class="rounded-lg border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Export CSV</a>
+    <div class="flex items-center gap-2">
+      <button onclick="window.print()" class="no-print rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-1.5">
+        {% icon 'document' 16 'h-4 w-4' %} Print
+      </button>
+      <a href="{% url 'reports:inventory_csv' %}" class="rounded-lg border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Export CSV</a>
+    </div>
   </div>
 
   <div class="card overflow-hidden !p-0">

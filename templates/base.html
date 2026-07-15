@@ -1,4 +1,4 @@
-{% load static %}{% load icons %}
+{% load static %}{% load icons %}{% load i18n %}
 <!-- base.html — global application shell (sidebar + topbar + content).
      Design system: Data-Dense Dashboard, slate + emerald (#059669),
      SVG Heroicons (no emoji), consistent nav hierarchy. -->
@@ -9,7 +9,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Warehouse{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/dist.css' %}">
-  <style>[x-cloak] { display: none !important; }</style>
+  <style>
+    [x-cloak] { display: none !important; }
+    @media print {
+      aside, header, nav, button, .btn-primary, .no-print, form.no-print, a.no-print, .flash-messages, .btn, [href*="Export CSV"] {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: #000000 !important;
+      }
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+      }
+      table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+      }
+      th, td {
+        border: 1px solid #cbd5e1 !important;
+        padding: 6px 10px !important;
+      }
+    }
+  </style>
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
   <script src="{% static 'vendor/alpine.min.js' %}" defer></script>
   <script src="{% static 'vendor/chart.umd.min.js' %}" defer></script>
@@ -33,107 +62,107 @@
       <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5 text-sm">
         <!-- Group: Core -->
         <div class="space-y-1">
-          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Main</p>
+          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{% translate "Main" %}</p>
           <a href="{% url 'dashboard:home' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'dashboard' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'dashboard' 20 'h-5 w-5 shrink-0' %}
-            <span>Dashboard</span>
+            <span>{% translate "Dashboard" %}</span>
           </a>
         </div>
 
         <!-- Group: Catalog -->
         <div class="space-y-1">
-          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Catalog</p>
+          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{% translate "Catalog" %}</p>
           {% with active=0 %}
           <a href="{% url 'categories:list' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'categories' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'category' 20 'h-5 w-5 shrink-0' %}
-            <span>Categories</span>
+            <span>{% translate "Categories" %}</span>
           </a>
           <a href="{% url 'units:list' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'units' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'ruler' 20 'h-5 w-5 shrink-0' %}
-            <span>Units</span>
+            <span>{% translate "Units" %}</span>
           </a>
           <a href="{% url 'suppliers:list' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'suppliers' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'truck' 20 'h-5 w-5 shrink-0' %}
-            <span>Suppliers</span>
+            <span>{% translate "Suppliers" %}</span>
           </a>
           <a href="{% url 'products:list' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'products' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'box' 20 'h-5 w-5 shrink-0' %}
-            <span>Products</span>
+            <span>{% translate "Products" %}</span>
           </a>
           {% endwith %}
         </div>
 
         <!-- Group: Inventory -->
         <div class="space-y-1">
-          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Inventory</p>
+          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{% translate "Inventory" %}</p>
           <a href="{% url 'stock:list' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'stock' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'archive' 20 'h-5 w-5 shrink-0' %}
-            <span>Stock</span>
+            <span>{% translate "Stock" %}</span>
           </a>
           <div class="ml-3 space-y-0.5 border-l border-slate-800 pl-3">
             <a href="{% url 'stock:in_create' %}"
                class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-colors
                       {% if request.resolver_match.view_name == 'stock:in_create' %}text-emerald-400 font-medium{% else %}text-slate-400 hover:bg-slate-800 hover:text-white{% endif %}">
               {% icon 'arrow-down' 16 'h-4 w-4 shrink-0' %}
-              Stock In
+              {% translate "Stock In" %}
             </a>
             <a href="{% url 'stock:out_create' %}"
                class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-colors
                       {% if request.resolver_match.view_name == 'stock:out_create' %}text-emerald-400 font-medium{% else %}text-slate-400 hover:bg-slate-800 hover:text-white{% endif %}">
               {% icon 'arrow-up' 16 'h-4 w-4 shrink-0' %}
-              Stock Out
+              {% translate "Stock Out" %}
             </a>
             <a href="{% url 'stock:adjust_create' %}"
                class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-colors
                       {% if request.resolver_match.view_name == 'stock:adjust_create' %}text-emerald-400 font-medium{% else %}text-slate-400 hover:bg-slate-800 hover:text-white{% endif %}">
               {% icon 'adjust' 16 'h-4 w-4 shrink-0' %}
-              Adjustment
+              {% translate "Adjustment" %}
             </a>
           </div>
         </div>
 
         <!-- Group: Analytics & System -->
         <div class="space-y-1">
-          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Analytics &amp; System</p>
+          <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{% translate "Analytics & System" %}</p>
           <a href="{% url 'reports:inventory' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'reports' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'chart' 20 'h-5 w-5 shrink-0' %}
-            <span>Reports</span>
+            <span>{% translate "Reports" %}</span>
           </a>
           <div class="ml-3 space-y-0.5 border-l border-slate-800 pl-3">
             <a href="{% url 'reports:inventory' %}"
                class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-colors
                       {% if request.resolver_match.view_name == 'reports:inventory' %}text-emerald-400 font-medium{% else %}text-slate-400 hover:bg-slate-800 hover:text-white{% endif %}">
-              {% icon 'box' 16 'h-4 w-4 shrink-0' %} Inventory
+              {% icon 'box' 16 'h-4 w-4 shrink-0' %} {% translate "Inventory" %}
             </a>
             <a href="{% url 'reports:low_stock' %}"
                class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-colors
                       {% if request.resolver_match.view_name == 'reports:low_stock' %}text-emerald-400 font-medium{% else %}text-slate-400 hover:bg-slate-800 hover:text-white{% endif %}">
-              {% icon 'exclamation' 16 'h-4 w-4 shrink-0' %} Low Stock
+              {% icon 'exclamation' 16 'h-4 w-4 shrink-0' %} {% translate "Low Stock" %}
             </a>
             <a href="{% url 'reports:stock_card' %}"
                class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] transition-colors
                       {% if request.resolver_match.view_name == 'reports:stock_card' %}text-emerald-400 font-medium{% else %}text-slate-400 hover:bg-slate-800 hover:text-white{% endif %}">
-              {% icon 'document' 16 'h-4 w-4 shrink-0' %} Stock Card
+              {% icon 'document' 16 'h-4 w-4 shrink-0' %} {% translate "Stock Card" %}
             </a>
           </div>
           <a href="{% url 'notifications:list' %}"
              class="group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'notifications' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
-            <span class="flex items-center gap-3">{% icon 'bell' 20 'h-5 w-5 shrink-0' %} Notifications</span>
+            <span class="flex items-center gap-3">{% icon 'bell' 20 'h-5 w-5 shrink-0' %} {% translate "Notifications" %}</span>
             {% if notification_unread_count > 0 %}
               <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">{{ notification_unread_count }}</span>
             {% endif %}
@@ -142,13 +171,19 @@
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
                     {% if request.resolver_match.app_name == 'search' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'search' 20 'h-5 w-5 shrink-0' %}
-            <span>Search</span>
+            <span>{% translate "Search" %}</span>
+          </a>
+          <a href="{% url 'settings_app:activity_logs' %}"
+             class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
+                    {% if request.resolver_match.view_name == 'settings_app:activity_logs' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
+            {% icon 'document' 20 'h-5 w-5 shrink-0' %}
+            <span>{% translate "Activity Logs" %}</span>
           </a>
           <a href="{% url 'settings_app:edit' %}"
              class="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
-                    {% if request.resolver_match.app_name == 'settings_app' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
+                    {% if request.resolver_match.app_name == 'settings_app' and request.resolver_match.view_name != 'settings_app:activity_logs' %}bg-emerald-600 text-white font-medium{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
             {% icon 'cog' 20 'h-5 w-5 shrink-0' %}
-            <span>Settings</span>
+            <span>{% translate "Settings" %}</span>
           </a>
         </div>
       </nav>
@@ -226,6 +261,22 @@
         </div>
 
         <div class="flex shrink-0 items-center gap-2">
+          <!-- Language Selector -->
+          <form action="{% url 'set_language' %}" method="post" class="inline mr-1">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+            <select name="language" onchange="this.form.submit()" class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer">
+              {% get_current_language as LANGUAGE_CODE %}
+              {% get_available_languages as LANGUAGES %}
+              {% get_language_info_list for LANGUAGES as languages %}
+              {% for language in languages %}
+                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                  {{ language.name_local|title }} ({{ language.code|upper }})
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+
           <a href="{% url 'notifications:list' %}" class="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="Notifications">
             {% icon 'bell' 20 'h-5 w-5' %}
             {% if notification_unread_count > 0 %}
@@ -246,7 +297,7 @@
       </header>
 
       <!-- Flash messages -->
-      <div class="px-4 pt-4 md:px-6">
+      <div class="px-4 pt-4 md:px-6 flash-messages">
         {% if messages %}
           {% for message in messages %}
             <div class="mb-3 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm

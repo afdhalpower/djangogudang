@@ -1,0 +1,275 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-15 09:48+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: accounts/views.py:28
+msgid "Password berhasil diubah."
+msgstr "Password berhasil diubah."
+
+#: accounts/views.py:44
+msgid "Profil berhasil diperbarui."
+msgstr "Profil berhasil diperbarui."
+
+#: config/settings.py:117
+msgid "English"
+msgstr "Inggris"
+
+#: config/settings.py:118
+msgid "Bahasa Indonesia"
+msgstr "Bahasa Indonesia"
+
+#: dashboard/views.py:88
+msgid "Healthy"
+msgstr "Sehat"
+
+#: dashboard/views.py:89 templates/base.html:154
+msgid "Low Stock"
+msgstr "Stok Rendah"
+
+#: dashboard/views.py:90 templates/dashboard/home.html:32
+#: templates/products/list.html:23
+msgid "Inactive"
+msgstr "Nonaktif"
+
+#: templates/base.html:65
+msgid "Main"
+msgstr "Utama"
+
+#: templates/base.html:70 templates/dashboard/home.html:5
+#: templates/dashboard/home.html:6
+msgid "Dashboard"
+msgstr "Dasbor"
+
+#: templates/base.html:76
+msgid "Catalog"
+msgstr "Katalog"
+
+#: templates/base.html:82
+msgid "Categories"
+msgstr "Kategori"
+
+#: templates/base.html:88
+msgid "Units"
+msgstr "Satuan"
+
+#: templates/base.html:94
+msgid "Suppliers"
+msgstr "Pemasok"
+
+#: templates/base.html:100 templates/products/list.html:4
+#: templates/products/list.html:5
+msgid "Products"
+msgstr "Produk"
+
+#: templates/base.html:107 templates/base.html:149
+msgid "Inventory"
+msgstr "Inventaris"
+
+#: templates/base.html:112 templates/products/list.html:49
+msgid "Stock"
+msgstr "Stok"
+
+#: templates/base.html:119
+msgid "Stock In"
+msgstr "Stok Masuk"
+
+#: templates/base.html:125
+msgid "Stock Out"
+msgstr "Stok Keluar"
+
+#: templates/base.html:131
+msgid "Adjustment"
+msgstr "Penyesuaian"
+
+#: templates/base.html:138
+msgid "Analytics & System"
+msgstr "Analitik & Sistem"
+
+#: templates/base.html:143
+msgid "Reports"
+msgstr "Laporan"
+
+#: templates/base.html:159
+msgid "Stock Card"
+msgstr "Kartu Stok"
+
+#: templates/base.html:165
+msgid "Notifications"
+msgstr "Notifikasi"
+
+#: templates/base.html:174
+msgid "Search"
+msgstr "Cari"
+
+#: templates/base.html:180 templates/settings_app/activity_logs.html:5
+#: templates/settings_app/activity_logs.html:6
+msgid "Activity Logs"
+msgstr "Log Aktivitas"
+
+#: templates/base.html:186
+msgid "Settings"
+msgstr "Pengaturan"
+
+#: templates/dashboard/home.html:18
+msgid "Total Products"
+msgstr "Total Produk"
+
+#: templates/dashboard/home.html:25
+msgid "Low Stock Items"
+msgstr "Barang Stok Rendah"
+
+#: templates/dashboard/home.html:39
+msgid "Stock In Today"
+msgstr "Stok Masuk Hari Ini"
+
+#: templates/dashboard/home.html:46
+msgid "Stock Out Today"
+msgstr "Stok Keluar Hari Ini"
+
+#: templates/dashboard/home.html:58
+msgid "Stock Movement (14 days)"
+msgstr "Pergerakan Stok (14 hari)"
+
+#: templates/dashboard/home.html:61
+msgid "In"
+msgstr "Masuk"
+
+#: templates/dashboard/home.html:62
+msgid "Out"
+msgstr "Keluar"
+
+#: templates/dashboard/home.html:63
+msgid "Adj"
+msgstr "Penyesuaian"
+
+#: templates/dashboard/home.html:75
+msgid "Stock Health"
+msgstr "Kesehatan Stok"
+
+#: templates/products/list.html:21
+msgid "All Status"
+msgstr "Semua Status"
+
+#: templates/products/list.html:22
+msgid "Active"
+msgstr "Aktif"
+
+#: templates/products/list.html:26
+msgid "All Categories"
+msgstr "Semua Kategori"
+
+#: templates/products/list.html:31
+msgid "Filter"
+msgstr "Filter"
+
+#: templates/products/list.html:33
+msgid "Clear"
+msgstr "Bersihkan"
+
+#: templates/products/list.html:36
+msgid "New Product"
+msgstr "Produk Baru"
+
+#: templates/products/list.html:46
+msgid "SKU"
+msgstr "SKU"
+
+#: templates/products/list.html:47
+msgid "Name"
+msgstr "Nama"
+
+#: templates/products/list.html:48
+msgid "Category"
+msgstr "Kategori"
+
+#: templates/products/list.html:50
+msgid "Price"
+msgstr "Harga"
+
+#: templates/products/list.html:51
+msgid "Status"
+msgstr "Status"
+
+#: templates/products/list.html:52
+msgid "Actions"
+msgstr "Aksi"
+
+#: templates/reports/low_stock.html:64
+msgid "Reorder Recommendations"
+msgstr "Rekomendasi Pemesanan Ulang"
+
+#: templates/reports/low_stock.html:81
+msgid "Generate Email Draft"
+msgstr "Buat Draf Email"
+
+#: templates/reports/low_stock.html:92
+msgid "Reorder Email Draft"
+msgstr "Draf Email Pemesanan Ulang"
+
+#: templates/reports/low_stock.html:97
+msgid "Recipient Email"
+msgstr "Email Penerima"
+
+#: templates/reports/low_stock.html:101
+msgid "Subject"
+msgstr "Subjek"
+
+#: templates/reports/low_stock.html:105
+msgid "Message Body"
+msgstr "Isi Pesan"
+
+#: templates/reports/low_stock.html:111
+msgid "Copy Draft"
+msgstr "Salin Draf"
+
+#: templates/reports/low_stock.html:114
+msgid "Close"
+msgstr "Tutup"
+
+#: templates/settings_app/activity_logs.html:12
+msgid "System audit trail showing recent actions performed by users."
+msgstr "Audit trail sistem yang menampilkan tindakan terbaru yang dilakukan oleh pengguna."
+
+#: templates/settings_app/activity_logs.html:15
+msgid "Print"
+msgstr "Cetak"
+
+#: templates/settings_app/activity_logs.html:23
+msgid "Timestamp"
+msgstr "Waktu Kejadian"
+
+#: templates/settings_app/activity_logs.html:24
+msgid "User"
+msgstr "Pengguna"
+
+#: templates/settings_app/activity_logs.html:25
+msgid "Action"
+msgstr "Tindakan"
+
+#: templates/settings_app/activity_logs.html:26
+msgid "Details"
+msgstr "Detail"
+
+#: templates/settings_app/activity_logs.html:42
+msgid "System"
+msgstr "Sistem"
+
+#: templates/settings_app/activity_logs.html:50
+msgid "No logs recorded yet."
+msgstr "Belum ada log yang tercatat."

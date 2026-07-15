@@ -116,6 +116,37 @@ class LowStockReportView(LoginRequiredMixin, TemplateView):
         ).select_related("category", "unit", "supplier").order_by("current_stock")
         context["products"] = products
         context["count"] = products.count()
+
+        # Compile reorder recommendations grouped by supplier
+        from collections import defaultdict
+        recommendations = defaultdict(list)
+        for p in products:
+            if p.supplier:
+                shortage = p.minimum_stock - p.current_stock
+                # Default recommended order quantity: shortage doubled, min 10 units
+                reorder_qty = max(shortage * 2, 10)
+                recommendations[p.supplier].append({
+                    "product": p,
+                    "shortage": shortage,
+                    "reorder_qty": reorder_qty,
+                })
+
+        reorder_list = []
+        for supplier, items in recommendations.items():
+            email_body = f"Dear {supplier.company_name},\n\nWe would like to request a reorder for the following items:\n\n"
+            for item in items:
+                prod = item["product"]
+                email_body += f"- {prod.name} (SKU: {prod.sku}) — Qty: {item['reorder_qty']} {prod.unit.abbreviation}\n"
+            email_body += "\nPlease confirm the pricing and estimated delivery date.\n\nBest regards,\nWarehouse Management"
+
+            reorder_list.append({
+                "supplier": supplier,
+                "items": items,
+                "email_subject": f"Purchase Reorder - {supplier.company_name}",
+                "email_body": email_body,
+            })
+
+        context["reorder_recommendations"] = reorder_list
         return context
 
 

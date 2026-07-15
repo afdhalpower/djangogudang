@@ -26,12 +26,24 @@ class UnitCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = "units/form.html"
     success_message = "Unit created successfully."
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Created Unit", f"Name: {self.object.name} ({self.object.abbreviation})")
+        return response
+
 
 class UnitUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Unit
     form_class = UnitForm
     template_name = "units/form.html"
     success_message = "Unit updated successfully."
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Updated Unit", f"Name: {self.object.name} ({self.object.abbreviation}), Status: {self.object.status}")
+        return response
 
 
 class UnitDeleteView(LoginRequiredMixin, DeleteView):
@@ -42,4 +54,6 @@ class UnitDeleteView(LoginRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
+        from core.utils import log_activity
+        log_activity(self.request.user, "Deleted Unit", f"Name: {self.get_object().name}")
         return super().form_valid(form)

@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% load icons %}
-{% block title %}Dashboard · Warehouse{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Dashboard" %} · Warehouse{% endblock %}
+{% block page_title %}{% translate "Dashboard" %}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6">
@@ -14,35 +15,35 @@
       <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
       <div>
         <p class="text-2xl font-bold">{{ total_products }}</p>
-        <p class="text-xs text-slate-500">Total Products</p>
+        <p class="text-xs text-slate-500">{% translate "Total Products" %}</p>
       </div>
     </div>
     <div class="card flex items-center gap-4">
       <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg></div>
       <div>
         <p class="text-2xl font-bold text-red-600">{{ low_stock }}</p>
-        <p class="text-xs text-slate-500">Low Stock Items</p>
+        <p class="text-xs text-slate-500">{% translate "Low Stock Items" %}</p>
       </div>
     </div>
     <div class="card flex items-center gap-4">
       <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></div>
       <div>
         <p class="text-2xl font-bold">{{ inactive_products }}</p>
-        <p class="text-xs text-slate-500">Inactive</p>
+        <p class="text-xs text-slate-500">{% translate "Inactive" %}</p>
       </div>
     </div>
     <div class="card flex items-center gap-4">
       <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
       <div>
         <p class="text-2xl font-bold">{{ stock_in_today }}</p>
-        <p class="text-xs text-slate-500">Stock In Today</p>
+        <p class="text-xs text-slate-500">{% translate "Stock In Today" %}</p>
       </div>
     </div>
     <div class="card flex items-center gap-4">
       <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg></div>
       <div>
         <p class="text-2xl font-bold">{{ stock_out_today }}</p>
-        <p class="text-xs text-slate-500">Stock Out Today</p>
+        <p class="text-xs text-slate-500">{% translate "Stock Out Today" %}</p>
       </div>
     </div>
   </div>
@@ -54,12 +55,12 @@
       <div class="mb-4 flex items-center justify-between">
         <h2 class="flex items-center gap-2 text-sm font-semibold text-slate-700">
           {% icon 'chart' 18 'h-4 w-4 text-emerald-600' %}
-          Stock Movement (14 days)
+          {% translate "Stock Movement (14 days)" %}
         </h2>
         <div class="flex items-center gap-3 text-xs text-slate-500">
-          <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> In</span>
-          <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-500"></span> Out</span>
-          <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Adj</span>
+          <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> {% translate "In" %}</span>
+          <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-500"></span> {% translate "Out" %}</span>
+          <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> {% translate "Adj" %}</span>
         </div>
       </div>
       <div class="relative h-64">
@@ -71,7 +72,7 @@
     <div class="card">
       <h2 class="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
         {% icon 'check' 18 'h-4 w-4 text-emerald-600' %}
-        Stock Health
+        {% translate "Stock Health" %}
       </h2>
       <div class="relative mx-auto h-44 w-44">
         <canvas id="healthChart"></canvas>
