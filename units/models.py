@@ -1,9 +1,5 @@
 """
 Unit model — measurement units for Products (pcs, box, kg, liter, pack...).
-
-MENTOR NOTE: This is a classic "lookup table" in Django — simple, shared,
-referenced by ForeignKey from Product. The structure is nearly identical to
-Category, which reinforces the DRY pattern of CBV + ModelForm.
 """
 from django.db import models
 from django.urls import reverse

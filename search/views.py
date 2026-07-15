@@ -27,34 +27,34 @@ class GlobalSearchView(LoginRequiredMixin, TemplateView):
             return context
 
         # Products
-        products = Product.objects.filter(
+        products = list(Product.objects.filter(
             Q(name__icontains=q)
             | Q(sku__icontains=q)
             | Q(barcode__icontains=q)
             | Q(description__icontains=q)
-        ).select_related("category", "unit", "supplier")[:10]
+        ).select_related("category", "unit", "supplier")[:10])
         context["products"] = products
-        context["product_count"] = products.count()
+        context["product_count"] = len(products)
 
         # Suppliers
-        suppliers = Supplier.objects.filter(
+        suppliers = list(Supplier.objects.filter(
             Q(company_name__icontains=q)
             | Q(contact_person__icontains=q)
             | Q(phone__icontains=q)
             | Q(email__icontains=q)
-        )[:10]
+        )[:10])
         context["suppliers"] = suppliers
-        context["supplier_count"] = suppliers.count()
+        context["supplier_count"] = len(suppliers)
 
         # Stock transactions
-        transactions = StockTransaction.objects.filter(
+        transactions = list(StockTransaction.objects.filter(
             Q(reference_number__icontains=q)
             | Q(notes__icontains=q)
         ).select_related("created_by").prefetch_related(
             "items", "items__product"
-        )[:10]
+        )[:10])
         context["transactions"] = transactions
-        context["transaction_count"] = transactions.count()
+        context["transaction_count"] = len(transactions)
 
         return context
 
@@ -80,7 +80,7 @@ def global_search_json(request):
             "type": "product",
             "label": f"{p.sku} — {p.name}",
             "subtitle": f"{p.current_stock} {p.unit.abbreviation} · {p.category.name if p.category else '—'}",
-            "url": f"/products/{p.pk}/",
+            "url": p.get_absolute_url(),
         })
 
     # Categories
@@ -90,7 +90,7 @@ def global_search_json(request):
             "type": "category",
             "label": c.name,
             "subtitle": f"{'Active' if c.status == 'active' else 'Inactive'}",
-            "url": f"/categories/{c.pk}/",
+            "url": c.get_absolute_url(),
         })
 
     # Suppliers
@@ -102,7 +102,7 @@ def global_search_json(request):
             "type": "supplier",
             "label": s.company_name,
             "subtitle": s.contact_person or "—",
-            "url": f"/suppliers/{s.pk}/",
+            "url": s.get_absolute_url(),
         })
 
     return JsonResponse({"results": results, "total": len(results)})

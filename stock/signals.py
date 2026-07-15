@@ -1,19 +1,5 @@
 """
-Signals — update product stock incrementally on every transaction.
-
-FIX: Previously we recalculated stock from ALL transactions, which erased
-the seed value (current_stock set directly on model). Now we use an
-INCREMENTAL approach — adding/subtracting from current_stock directly.
-
-This matches how a real warehouse works: you set initial stock when
-creating the product, then every IN/OUT adjusts it.
-
-ARCHITECTURE NOTE:
-- Incremental updates are simpler but CAN drift if a transaction is
-  deleted/modified. For a production system you'd add a reconciliation
-  script. For a learning project this is the right balance.
-- F() expressions do the update in a single SQL statement (race-condition
-  resistant, no need for select_for_update for most cases).
+Signals to incrementally update product stock on every transaction.
 """
 from django.db.models import F
 from django.db.models.signals import post_save, post_delete
@@ -27,25 +13,24 @@ from products.models import Product
 def stock_item_saved(sender, instance, created, **kwargs):
     """
     On every item save:
-      - OUT: validate stock is sufficient BEFORE subtracting.
-      - Update current_stock atomically with F().
+      - For stock reduction (OUT/ADJUSTMENT remove): lock the product row,
+        validate that current stock is sufficient, and subtract atomically.
+      - For stock addition (IN/ADJUSTMENT add): add to stock atomically.
     """
     if not created:
-        return  # Only act on NEW items; edits handled separately later
+        return
 
     movement_type = instance.transaction.movement_type
     product_id = instance.product_id
     qty = instance.quantity
 
     if movement_type == StockTransaction.MOVEMENT_IN:
-        # Increase stock atomically
         Product.objects.filter(pk=product_id).update(
             current_stock=F("current_stock") + qty
         )
 
     elif movement_type == StockTransaction.MOVEMENT_OUT:
-        # Check — SELECT then UPDATE (prevents negative without table-lock)
-        product = Product.objects.get(pk=product_id)
+        product = Product.objects.select_for_update().get(pk=product_id)
         if product.current_stock < qty:
             raise ValidationError(
                 f"Insufficient stock for {product.name} (SKU: {product.sku}). "
@@ -56,15 +41,13 @@ def stock_item_saved(sender, instance, created, **kwargs):
         )
 
     elif movement_type == StockTransaction.MOVEMENT_ADJUSTMENT:
-        # Adjustment direction determines add or remove
         direction = instance.transaction.adjustment_direction
         if direction == "add":
             Product.objects.filter(pk=product_id).update(
                 current_stock=F("current_stock") + qty
             )
         else:
-            # For "remove", validate sufficient stock
-            product = Product.objects.get(pk=product_id)
+            product = Product.objects.select_for_update().get(pk=product_id)
             if product.current_stock < qty:
                 raise ValidationError(
                     f"Insufficient stock for {product.name} (SKU: {product.sku}). "

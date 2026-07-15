@@ -1,12 +1,5 @@
 """
 Products views — full CRUD plus search/filter.
-
-PERFORMANCE NOTE:
-We use select_related('category', 'unit', 'supplier') in the list view to
-prevent N+1 queries. Without this, every row in the table would fire an
-extra SQL query to fetch the category name, supplier company, etc.
-This is the Django equivalent of Laravel's `->with('category')` eager loading.
-One query vs (1 + N) queries.
 """
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -25,11 +18,6 @@ class ProductListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        """
-        select_related() joins the FK tables in ONE query.
-        Without it: 21 queries for 20 products (1 + 20 category lookups).
-        With it: 1 query (JOINs are cheap).
-        """
         qs = Product.objects.select_related("category", "unit", "supplier").all()
 
         # --- Search (name, sku, barcode) ---

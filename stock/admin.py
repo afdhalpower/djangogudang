@@ -4,8 +4,7 @@ from .models import StockTransaction, StockTransactionItem
 
 class StockTransactionItemInline(admin.TabularInline):
     """
-    Inline admin — like Laravel's `Nova HasMany` / Filament `Repeater`.
-    Shows/edit line items directly on the parent StockTransaction form.
+    Inline admin to show/edit line items directly on the parent StockTransaction form.
     """
     model = StockTransactionItem
     extra = 1

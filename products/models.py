@@ -1,23 +1,9 @@
 """
 Product model — the core entity of the warehouse system.
-
-MENTOR NOTE (Laravel -> Django):
-- ForeignKey('Category') == $this->belongsTo(Category::class)
-  Django automatically creates a DB index on FK fields for performance.
-- ImageField handles file uploads (like Laravel's $fillable + request->file).
-  We serve uploaded files via MEDIA_URL during dev; in production you'd use
-  S3/CloudFront (like Laravel's filesystem disks).
-- DecimalField for money — NEVER use FloatField (precision loss is a bug).
-- select_related() is the Django equivalent of ->with() / eager loading.
-  We'll apply it in the view to prevent N+1 queries.
-
-New concept — Indexing:
-  Django creates indexes automatically on primary keys and ForeignKey fields.
-  For text search (name, sku, barcode) we add explicit db_index=True to
-  speed up the search/filter queries we'll build.
 """
 from django.db import models
 from django.urls import reverse
+from decimal import Decimal
 from categories.models import Category
 from units.models import Unit
 from suppliers.models import Supplier
@@ -26,8 +12,6 @@ from suppliers.models import Supplier
 def product_image_path(instance, filename):
     """
     Store uploads in media/products/<sku>/<filename>.
-    This keeps files organised per product, like Laravel's
-    `$product->addMedia($file)->toMediaCollection('images')`.
     """
     return f"products/{instance.sku}/{filename}"
 
@@ -51,7 +35,7 @@ class Product(models.Model):
     name = models.CharField(max_length=300, db_index=True)
     description = models.TextField(blank=True)
 
-    # Relationships (FK = Laravel belongsTo)
+    # Relationships
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT,
         related_name="products",
@@ -69,7 +53,7 @@ class Product(models.Model):
         verbose_name="Supplier",
     )
 
-    # Pricing — use DecimalField, never FloatField for money!
+    # Pricing
     purchase_price = models.DecimalField(
         max_digits=14, decimal_places=2, default=0,
         verbose_name="Purchase Price",
@@ -98,7 +82,6 @@ class Product(models.Model):
         ordering = ["name"]
         verbose_name_plural = "Products"
         indexes = [
-            # Composite index for the most common search pattern
             models.Index(fields=["name", "sku", "barcode"]),
         ]
 
@@ -117,14 +100,14 @@ class Product(models.Model):
 
     @property
     def profit_margin(self):
-        """Gross profit per unit. Safe even if purchase_price is 0."""
+        """Gross profit per unit."""
         if self.purchase_price > 0:
-            return float(self.selling_price - self.purchase_price)
-        return 0.0
+            return self.selling_price - self.purchase_price
+        return Decimal("0.00")
 
     @property
     def profit_margin_percent(self):
         if self.purchase_price > 0:
-            return round((float(self.selling_price) - float(self.purchase_price))
-                         / float(self.purchase_price) * 100, 1)
-        return 0.0
+            return round((self.selling_price - self.purchase_price)
+                         / self.purchase_price * 100, 1)
+        return Decimal("0.0")

@@ -3,14 +3,7 @@ from django.core.validators import MinValueValidator
 
 
 class CompanySetting(models.Model):
-    """Single-instance model for company & warehouse configuration.
-
-    MENTOR NOTE (Laravel → Django):
-    This is Django's version of a single-row settings table — vs Laravel
-    where you'd typically stash config in config/*.php or a settings
-    JSON column. Django's ORM makes single-row models easy with
-    get_or_create() and get_first() patterns.
-    """
+    """Single-instance model for company & warehouse configuration."""
     # Company info
     company_name = models.CharField(max_length=255, default="My Warehouse")
     tax_id = models.CharField("Tax ID / NPWP", max_length=50, blank=True, default="")

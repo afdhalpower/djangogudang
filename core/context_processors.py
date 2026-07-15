@@ -11,6 +11,12 @@ from products.models import Product
 def notification_unread_count(request):
     if not hasattr(request, "user") or not request.user.is_authenticated:
         return {"notification_unread_count": 0}
+    
+    from settings_app.models import CompanySetting
+    settings = CompanySetting.get_settings()
+    if not settings.enable_low_stock_alert:
+        return {"notification_unread_count": 0}
+
     count = Product.objects.filter(
         current_stock__lte=F("minimum_stock")
     ).count()

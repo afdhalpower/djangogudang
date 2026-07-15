@@ -1,15 +1,5 @@
 """
-Notification — low stock alert triggered by dashboard middleware/view.
-
-MENTOR NOTE: Notifications are read-only computed data (no DB model needed).
-We generate them on-the-fly from product stock queries. This matches
-Django's "thin model, fat query" philosophy — no need to store what you
-can compute.
-
-For a real system you'd add:
-- A Notification model with is_read, created_at
-- Django channels / WebSocket for push
-- Email/SMS/Telegram integration
+Notification — low stock alert list.
 """
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
@@ -17,6 +7,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from products.models import Product
 from suppliers.models import Supplier
+from settings_app.models import CompanySetting
 
 
 class NotificationListView(LoginRequiredMixin, TemplateView):
@@ -25,6 +16,18 @@ class NotificationListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        settings = CompanySetting.get_settings()
+        alerts_enabled = settings.enable_low_stock_alert
+
+        if not alerts_enabled:
+            context.update(
+                shortages=[],
+                total_low_stock=0,
+                critical_count=0,
+                alerts_enabled=False,
+            )
+            return context
 
         # Low stock products
         low_stock = Product.objects.filter(
@@ -51,5 +54,6 @@ class NotificationListView(LoginRequiredMixin, TemplateView):
             shortages=shortages,
             total_low_stock=low_stock.count(),
             critical_count=critical,
+            alerts_enabled=True,
         )
         return context

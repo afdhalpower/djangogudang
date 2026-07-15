@@ -1,11 +1,5 @@
 """
 Supplier model — who we buy products from.
-
-MENTOR NOTE: Unlike Categories and Units which are simple lookup tables,
-Supplier has richer fields (phone, email, address). The address field and
-contact person represent real-world supplier management patterns. In production
-you'd likely normalise address into its own model, but for this scope inline
-fields keep things teachable.
 """
 from django.db import models
 from django.urls import reverse

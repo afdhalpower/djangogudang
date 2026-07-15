@@ -11,7 +11,7 @@
       <p class="text-sm text-slate-500">Silakan masuk untuk melanjutkan</p>
     </div>
 
-    <!-- Django's auth form. The csrf_token tag is mandatory, like Laravel's @csrf -->
+    <!-- Django's auth form. The csrf_token tag is mandatory. -->
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.errors %}

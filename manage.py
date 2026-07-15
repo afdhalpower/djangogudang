@@ -1,12 +1,5 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks.
-Analogous to `php artisan` in Laravel — every management command
-(migrate, runserver, makemigrations, createsuperuser) goes through here.
-
-NOTE: We clear PYTHONPATH to prevent the Hermes agent environment (which
-may have broken/incompatible packages like a Python 3.11 Pillow) from
-contaminating our project's dependencies.
-"""
+"""Django's command-line utility for administrative tasks."""
 import os
 import sys
 

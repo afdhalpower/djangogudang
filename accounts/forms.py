@@ -4,13 +4,7 @@ from .models import User
 
 
 class UserProfileForm(forms.ModelForm):
-    """Edit the logged-in user's own profile.
-
-    MENTOR NOTE: A ModelForm auto-generates fields from the model and handles
-    validation + save — like Laravel's Form Requests + mass-assignment, but wired
-    directly to the ORM. We restrict `fields` to avoid mass-assignment of
-    dangerous columns (role/is_staff) — Django's equivalent of `$guarded`/`$fillable`.
-    """
+    """Edit the logged-in user's own profile."""
     class Meta:
         model = User
         # Deliberately EXCLUDE `role`, `is_staff`, `is_superuser` — a user must

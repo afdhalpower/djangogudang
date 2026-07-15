@@ -42,12 +42,18 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
         ).prefetch_related("items", "items__product")[:5]
 
         # --- Chart 1: Stock movement trend (last 14 days) ---
+        from django.db.models import Count
         last_14 = [today - timedelta(days=i) for i in range(13, -1, -1)]
         tx_by_day = defaultdict(lambda: {"in": 0, "out": 0, "adjustment": 0})
-        txs = StockTransaction.objects.filter(date__gte=last_14[0])
+        txs = (
+            StockTransaction.objects.filter(date__gte=last_14[0])
+            .values("date", "movement_type")
+            .annotate(count=Count("id"))
+        )
         for t in txs:
-            if t.date in last_14:
-                tx_by_day[t.date][t.movement_type] += 1
+            d = t["date"]
+            if d in last_14:
+                tx_by_day[d][t["movement_type"]] = t["count"]
         trend_labels = [d.strftime("%d %b") for d in last_14]
         trend_in = [tx_by_day[d]["in"] for d in last_14]
         trend_out = [tx_by_day[d]["out"] for d in last_14]

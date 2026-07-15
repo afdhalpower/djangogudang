@@ -9,10 +9,6 @@ from .forms import UserProfileForm
 
 
 # --- AUTHENTICATION -------------------------------------------------------
-# Django ships fully-tested auth views (LoginView, LogoutView, PasswordChangeView).
-# Reusing them = "keep views thin" + don't reinvent security. We only point them
-# at our templates and set redirects — exactly like Laravel's built-in Auth
-# controllers, but we don't even have to write them.
 
 
 class LoginView(auth_views.LoginView):
@@ -21,9 +17,6 @@ class LoginView(auth_views.LoginView):
 
 
 class LogoutView(auth_views.LogoutView):
-    # Django 5 requires POST for logout (CSRF-protected) — this is correct
-    # security behavior, preventing a third party from logging a user out via
-    # a simple GET link. The template submits a small POST form for this.
     next_page = reverse_lazy("accounts:login")
 
 
@@ -38,12 +31,7 @@ class PasswordChangeView(auth_views.PasswordChangeView):
 
 # --- PROFILE (self-service) ------------------------------------------------
 class ProfileView(LoginRequiredMixin, UpdateView):
-    """Let the current user edit their own profile.
-
-    LoginRequiredMixin = require auth (like Laravel's `auth` middleware /
-    `$this->middleware('auth')`). `get_object` pins the edit to request.user
-    so a user can NEVER edit someone else — authorization enforced server-side.
-    """
+    """Let the current user edit their own profile."""
     model = User
     form_class = UserProfileForm
     template_name = "accounts/profile.html"

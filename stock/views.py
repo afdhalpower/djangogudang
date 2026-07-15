@@ -1,15 +1,5 @@
 """
 Stock views — Stock In, Stock Out, and Stock Adjustment with line items.
-
-Uses atomic transactions to ensure header+items are saved or rolled back as
-a single unit. If a signal (e.g. negative stock for OUT) raises an error,
-the entire transaction is rolled back — no orphan headers.
-
-MENTOR NOTE (Laravel -> Django):
-- django.db.transaction.atomic() == DB::transaction() in Laravel.
-- If any exception occurs inside the block, ALL DB changes are rolled back.
-- We catch ValidationError from signals and surface it as a user-facing
-  message, redirecting back to the form with the product selection preserved.
 """
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -20,6 +10,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib import messages
+from decimal import Decimal, InvalidOperation
 from .models import StockTransaction, StockTransactionItem
 from .forms import StockInForm, StockOutForm, StockAdjustmentForm
 from products.models import Product
@@ -35,13 +26,52 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
         """Atomic: save header + all items, or roll back entirely on error."""
         products_ids = self.request.POST.getlist("product_id")
         quantities = self.request.POST.getlist("quantity")
-        prices = self.request.POST.getlist("unit_price") or ["0"] * len(products_ids)
+        prices = self.request.POST.getlist("unit_price")
 
-        # Filter out empty rows
+        # Handle list size mismatch or empty submission
+        if not products_ids or not quantities:
+            messages.error(self.request, "Please add at least one product item.")
+            return redirect(self.request.path)
+
+        # Match prices list length with product_ids
+        if not prices:
+            prices = ["0"] * len(products_ids)
+        elif len(prices) < len(products_ids):
+            prices = list(prices) + ["0"] * (len(products_ids) - len(prices))
+
         rows = []
-        for pid, qty, price in zip(products_ids, quantities, prices):
-            if pid and qty and int(qty) > 0:
-                rows.append((int(pid), int(qty), price))
+        for i, (pid, qty, price) in enumerate(zip(products_ids, quantities, prices)):
+            if not pid:
+                continue
+            
+            # Ensure product ID is valid integer
+            if not pid.isdigit():
+                messages.error(self.request, f"Invalid Product ID at line {i+1}.")
+                return redirect(self.request.path)
+            
+            # Ensure quantity is positive integer
+            if not qty:
+                continue
+            try:
+                qty_val = int(qty)
+                if qty_val <= 0:
+                    messages.error(self.request, f"Quantity must be greater than 0 at line {i+1}.")
+                    return redirect(self.request.path)
+            except ValueError:
+                messages.error(self.request, f"Quantity must be an integer at line {i+1}.")
+                return redirect(self.request.path)
+
+            # Ensure unit price is valid non-negative decimal
+            try:
+                price_val = Decimal(price or "0")
+                if price_val < 0:
+                    messages.error(self.request, f"Unit price cannot be negative at line {i+1}.")
+                    return redirect(self.request.path)
+            except InvalidOperation:
+                messages.error(self.request, f"Invalid unit price format at line {i+1}.")
+                return redirect(self.request.path)
+
+            rows.append((int(pid), qty_val, price_val))
 
         if not rows:
             messages.error(self.request, "Please add at least one product item.")
@@ -59,12 +89,11 @@ class BaseStockCreateView(LoginRequiredMixin, CreateView):
                         transaction=transaction,
                         product_id=pid,
                         quantity=qty,
-                        unit_price=price or 0,
+                        unit_price=price,
                     )
 
         except ValidationError as e:
-            # Signal raised this — e.g. "Insufficient stock for Product X"
-            messages.error(self.request, str(e))
+            messages.error(self.request, ", ".join(e.messages))
             return redirect(self.request.path)
 
         messages.success(self.request, self.success_message)
@@ -94,13 +123,6 @@ class StockOutCreateView(BaseStockCreateView):
 
 
 class StockAdjustmentCreateView(BaseStockCreateView):
-    """Manual stock adjustment with reason (lost/damaged/expired/correction).
-
-    MENTOR NOTE: Extends the same BaseStockCreateView pattern, proving that
-    Django's class-based inheritance keeps views DRY even as features grow.
-    The template is slightly different (has reason + direction fields) but
-    the save/signal logic is entirely inherited.
-    """
     model = StockTransaction
     form_class = StockAdjustmentForm
     template_name = "stock/stock_adjustment_form.html"

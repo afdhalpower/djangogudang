@@ -5,46 +5,52 @@
 
 {% block content %}
 <div class="mx-auto max-w-4xl">
-  <div class="mb-4 flex items-center justify-between">
-    <p class="text-sm text-slate-500">
-      {{ total_low_stock }} product{{ total_low_stock|pluralize }} below minimum stock
-      {% if critical_count > 0 %}
-        · <span class="text-red-600 font-medium">{{ critical_count }} critical</span>
-      {% endif %}
-    </p>
-    <a href="{% url 'reports:low_stock' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">View Full Report</a>
-  </div>
+  {% if not alerts_enabled %}
+    <div class="card text-center border-l-4 border-l-amber-500">
+      <p class="py-8 text-slate-500 font-medium text-slate-600">Pemberitahuan stok rendah dinonaktifkan di pengaturan sistem.</p>
+    </div>
+  {% else %}
+    <div class="mb-4 flex items-center justify-between">
+      <p class="text-sm text-slate-500">
+        {{ total_low_stock }} product{{ total_low_stock|pluralize }} below minimum stock
+        {% if critical_count > 0 %}
+          · <span class="text-red-600 font-medium">{{ critical_count }} critical</span>
+        {% endif %}
+      </p>
+      <a href="{% url 'reports:low_stock' %}" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-100">View Full Report</a>
+    </div>
 
-  <div class="space-y-2">
-    {% for item in shortages %}
-      <div class="card flex items-start justify-between gap-4
-        {% if item.severity == 'critical' %}border-l-4 border-l-red-500{% else %}border-l-4 border-l-yellow-400{% endif %}">
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="rounded-full px-2 py-0.5 text-xs font-medium
-              {% if item.severity == 'critical' %}bg-red-100 text-red-700
-              {% else %}bg-yellow-100 text-yellow-700{% endif %}">
-              {{ item.severity|title }}
-            </span>
+    <div class="space-y-2">
+      {% for item in shortages %}
+        <div class="card flex items-start justify-between gap-4
+          {% if item.severity == 'critical' %}border-l-4 border-l-red-500{% else %}border-l-4 border-l-yellow-400{% endif %}">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="rounded-full px-2 py-0.5 text-xs font-medium
+                {% if item.severity == 'critical' %}bg-red-100 text-red-700
+                {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                {{ item.severity|title }}
+              </span>
+            </div>
+            <h3 class="text-sm font-semibold">
+              <a href="{% url 'products:detail' item.product.pk %}" class="hover:text-emerald-600">{{ item.product.name }}</a>
+            </h3>
+            <p class="text-sm text-slate-500 mt-0.5">
+              SKU: {{ item.product.sku }} ·
+              Stock: <span class="font-medium {% if item.severity == 'critical' %}text-red-600{% endif %}">{{ item.product.current_stock }}</span>
+              {{ item.product.unit.abbreviation }}
+              (minimum: {{ item.product.minimum_stock }})
+            </p>
+            <p class="mt-1 text-xs text-slate-400">Shortage: {{ item.shortage }} {{ item.product.unit.abbreviation }}</p>
           </div>
-          <h3 class="text-sm font-semibold">
-            <a href="{% url 'products:detail' item.product.pk %}" class="hover:text-emerald-600">{{ item.product.name }}</a>
-          </h3>
-          <p class="text-sm text-slate-500 mt-0.5">
-            SKU: {{ item.product.sku }} ·
-            Stock: <span class="font-medium {% if item.severity == 'critical' %}text-red-600{% endif %}">{{ item.product.current_stock }}</span>
-            {{ item.product.unit.abbreviation }}
-            (minimum: {{ item.product.minimum_stock }})
-          </p>
-          <p class="mt-1 text-xs text-slate-400">Shortage: {{ item.shortage }} {{ item.product.unit.abbreviation }}</p>
+          <a href="{% url 'products:detail' item.product.pk %}" class="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">View Product</a>
         </div>
-        <a href="{% url 'products:detail' item.product.pk %}" class="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">View Product</a>
-      </div>
-    {% empty %}
-      <div class="card text-center">
-        <p class="py-8 text-slate-500">All products have sufficient stock.</p>
-      </div>
-    {% endfor %}
-  </div>
+      {% empty %}
+        <div class="card text-center">
+          <p class="py-8 text-slate-500">All products have sufficient stock.</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

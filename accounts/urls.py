@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 # app_name enables namespaced URLs: `accounts:login`, `accounts:profile`, ...
-# Like Laravel named routes with a group prefix.
 app_name = "accounts"
 
 urlpatterns = [

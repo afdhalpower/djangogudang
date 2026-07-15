@@ -32,13 +32,7 @@ class StockOutForm(forms.ModelForm):
 
 
 class StockAdjustmentForm(forms.ModelForm):
-    """Form for manual stock adjustment with reason and direction.
-
-    MENTOR NOTE: Unlike StockInForm/StockOutForm which share the same fields,
-    Adjustment shows additional fields (reason, direction) specific to the
-    use case — demonstrating Django's "one form per use case" pattern even
-    when the underlying model is the same.
-    """
+    """Form for manual stock adjustment with reason and direction."""
     class Meta:
         model = StockTransaction
         fields = ["reference_number", "notes", "adjustment_reason", "adjustment_direction"]

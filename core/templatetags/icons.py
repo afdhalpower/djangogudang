@@ -1,11 +1,4 @@
-"""Template tags for consistent SVG icons (Heroicons outline style).
-
-MENTOR NOTE (Laravel -> Django):
-In Laravel Blade you'd use @svg() or an icon component. In Django we
-use a simple template tag that returns inline SVG markup. This keeps
-icons crisp at any size, themeable via currentColor, and avoids emoji
-(which the design system forbids).
-"""
+"""Template tags for consistent SVG icons (Heroicons outline style)."""
 from django import template
 from django.utils.safestring import mark_safe
 

@@ -1,26 +1,5 @@
 """
 Stock transaction models — track every stock movement (IN, OUT, ADJUSTMENT).
-
-ARCHITECTURE DECISION:
-We use a single model `StockTransaction` with `MOVEMENT_IN/OUT/ADJUSTMENT`
-instead of separate StockIn / StockOut / StockAdjustment tables. Why?
-- Single source of truth for ALL stock movement history.
-- Querying "all transactions for product X" is one table scan, not UNION three.
-- The `movement_type` discriminator + `quantity` sign (+/-) handles everything.
-- This is the Django equivalent of a polymorphic "transactions" table.
-
-A separate `StockTransactionItem` model holds individual line items so one
-receipt (Stock In) can contain multiple products — realistic warehouse flow.
-
-SIGNAL- vs SERVICE-LAYER debate:
-Updating product.current_stock could be done via a Django signal
-(post_save on StockTransactionItem) or a service method. We chose the
-signal approach because:
-  1. Ensures stock is ALWAYS updated when a transaction is saved (no
-     calling-convention bugs).
-  2. Django signals == Laravel Events/Observers. Same concept, different syntax.
-  3. We add validation in the signal to PREVENT negative stock for OUT type.
-For learning: this shows both signals AND model business logic.
 """
 from django.db import models, transaction
 from django.urls import reverse
@@ -31,7 +10,6 @@ from suppliers.models import Supplier
 class StockTransaction(models.Model):
     """
     A receipt or dispatch document — one transaction = multiple line items.
-    Like a purchase order (IN) or delivery note (OUT).
     """
     MOVEMENT_IN = "in"
     MOVEMENT_OUT = "out"
@@ -99,13 +77,7 @@ class StockTransaction(models.Model):
 class StockTransactionItem(models.Model):
     """
     Individual line item within a stock transaction.
-    One transaction can have many items (like a multi-line purchase order).
-
-    MENTOR NOTE:
-    Django's ForeignKey with related_name='items' lets us do
-    `transaction.items.all()` to get all line items — like Laravel's
-    `$transaction->items()->get()`. The `related_query_name` is optional
-    but allows `StockTransactionItem.objects.filter(transaction__pk=1)`.
+    One transaction can have many items.
     """
     transaction = models.ForeignKey(
         StockTransaction, on_delete=models.CASCADE,

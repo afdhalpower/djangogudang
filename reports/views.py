@@ -1,21 +1,12 @@
 """
 Reports — Inventory, Low Stock, Stock Card, and CSV export.
-
-Architecture decision: pure function-based views (not CBV) because:
-1. Each report has unique logic (query, chart data, export variants)
-2. Function views allow returning different response types (HTML vs CSV)
-3. Easier to compose shared logic (e.g. export_csv helper)
-
-MENTOR NOTE: Django supports both function views and class-based views.
-Use CBV for CRUD (where the pattern is the same), use function views for
-pages where the logic is unique (reports, dashboards, exports).
 """
 import csv
 from io import StringIO
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse
-from django.db.models import F, Sum, Q, Count
+from django.db.models import F, Sum, Q, Count, ExpressionWrapper, DecimalField
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView, ListView, DetailView
@@ -50,36 +41,36 @@ class InventoryReportView(LoginRequiredMixin, TemplateView):
     """
     Full product inventory table: current stock, minimum, status,
     purchase/selling price, and total inventory value.
-
-    MENTOR NOTE: TemplateView with context data is perfect for reports —
-    no form handling needed, just query and render.
     """
     template_name = "reports/inventory.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        products = Product.objects.select_related("category", "unit", "supplier").all()
+        products = Product.objects.select_related("category", "unit", "supplier").annotate(
+            inventory_value=ExpressionWrapper(
+                F("current_stock") * F("purchase_price"),
+                output_field=DecimalField()
+            )
+        )
 
-        # Totals
-        total_inventory_value = sum(
-            (p.current_stock * p.purchase_price) for p in products
+        # Totals calculated at database level
+        totals = Product.objects.aggregate(
+            total_inventory=Sum(
+                ExpressionWrapper(F("current_stock") * F("purchase_price"), output_field=DecimalField())
+            ),
+            total_selling=Sum(
+                ExpressionWrapper(F("current_stock") * F("selling_price"), output_field=DecimalField())
+            ),
         )
-        total_selling_value = sum(
-            (p.current_stock * p.selling_price) for p in products
-        )
+        total_inventory_value = totals["total_inventory"] or 0
+        total_selling_value = totals["total_selling"] or 0
+
         total_items = products.count()
         low_stock_count = products.filter(current_stock__lte=F("minimum_stock")).count()
 
-        products_list = []
-        for p in products:
-            products_list.append({
-                "product": p,
-                "inventory_value": p.current_stock * p.purchase_price,
-            })
-
         context.update(
-            products=products_list,
+            products=products,
             total_inventory_value=total_inventory_value,
             total_selling_value=total_selling_value,
             total_items=total_items,
@@ -159,8 +150,6 @@ class StockCardView(LoginRequiredMixin, TemplateView):
     """
     Per-product movement history — shows every IN/OUT/ADJUSTMENT
     that affected this product's stock.
-
-    Like a bank statement for inventory.
     """
     template_name = "reports/stock_card.html"
 
@@ -173,7 +162,7 @@ class StockCardView(LoginRequiredMixin, TemplateView):
         products = Product.objects.filter(status="active").select_related("unit")
         context["products"] = products
 
-        if product_id:
+        if product_id and product_id.isdigit():
             product = get_object_or_404(Product, pk=int(product_id))
             context["selected_product"] = product
 
@@ -189,8 +178,6 @@ class StockCardView(LoginRequiredMixin, TemplateView):
                 items = items.filter(transaction__date__lte=date_to)
 
             context["items"] = items
-            # Running balance starts from initial seed minus any transaction-based
-            # For accuracy, we calculate from DB
             context["date_from"] = date_from
             context["date_to"] = date_to
 
@@ -201,18 +188,14 @@ class StockCardView(LoginRequiredMixin, TemplateView):
 def stock_card_csv(request):
     """Export Stock Card for a specific product as CSV."""
     product_id = request.GET.get("product", "")
-    if not product_id:
-        return HttpResponse("Select a product first", status=400)
+    if not product_id or not product_id.isdigit():
+        return HttpResponse("Select a valid product first", status=400)
 
     product = get_object_or_404(Product, pk=int(product_id))
     items = StockTransactionItem.objects.filter(
         product=product
     ).select_related("transaction").order_by("transaction__date")
 
-    # Running balance
-    balance = product.current_stock
-    # We'll calculate backward from current stock
-    # Simple approach: just show movement type and qty
     rows = []
     for item in items:
         movement = item.transaction.movement_type

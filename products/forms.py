@@ -4,13 +4,7 @@ from .models import Product
 
 class ProductForm(forms.ModelForm):
     """
-    ModelForm for Product. Handles FK relationship fields as dropdowns
-    (Django auto-renders ModelChoiceField for ForeignKey fields).
-
-    MENTOR NOTE: Django's ModelForm reads the model's field types and picks
-    the right widget automatically. ForeignKey → <select>. ImageField →
-    file input. No manual field mapping needed — unlike Laravel where you
-    manually specify $casts and validation rules.
+    ModelForm for Product.
     """
     class Meta:
         model = Product
@@ -27,3 +21,9 @@ class ProductForm(forms.ModelForm):
         help_texts = {
             "current_stock": "Initial stock quantity. After creation, stock is managed via Stock In/Out transactions.",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["current_stock"].disabled = True
+            self.fields["current_stock"].help_text = "Stock is managed exclusively via transactions."

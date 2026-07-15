@@ -4,9 +4,7 @@ from .models import Category
 
 class CategoryForm(forms.ModelForm):
     """
-    ModelForm auto-generates fields from the Category model, adds validation,
-    and handles save(). It's like a Laravel FormRequest + Livewire form in one.
-    NOTE: You don't need to manually re-list fields — ModelForm reads them.
+    ModelForm for Category.
     """
     class Meta:
         model = Category

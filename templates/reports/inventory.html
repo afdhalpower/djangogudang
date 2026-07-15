@@ -42,7 +42,7 @@
             <td class="px-4 py-2 text-slate-500">{{ p.minimum_stock }}</td>
             <td class="px-4 py-2 text-right">Rp{{ p.purchase_price|floatformat:0 }}</td>
             <td class="px-4 py-2 text-right">Rp{{ p.selling_price|floatformat:0 }}</td>
-            <td class="px-4 py-2 text-right font-medium">Rp{{ p.current_stock|floatformat:0 }}</td>
+            <td class="px-4 py-2 text-right font-medium">Rp{{ p.inventory_value|floatformat:0 }}</td>
             <td class="px-4 py-2">
               {% if p.status == "active" %}
                 <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">Active</span>
